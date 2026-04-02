@@ -62,9 +62,9 @@ export default async function ProjectDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* 案件基本情報 */}
-        <div className="bg-white rounded-xl border shadow-sm p-6">
+        <div className="bg-white rounded-xl border shadow-sm p-4 sm:p-6">
           <h2 className="text-lg font-bold mb-4">案件情報</h2>
           <div className="space-y-3 text-sm">
             {[
@@ -93,7 +93,7 @@ export default async function ProjectDetailPage({ params }: Props) {
         </div>
 
         {/* 日程管理 */}
-        <div className="bg-white rounded-xl border shadow-sm p-6">
+        <div className="bg-white rounded-xl border shadow-sm p-4 sm:p-6">
           <h2 className="text-lg font-bold mb-4">日程管理</h2>
           <div className="space-y-3 text-sm">
             {[
@@ -177,9 +177,9 @@ export default async function ProjectDetailPage({ params }: Props) {
       </div>
 
       {/* 安全書類チェックリスト */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="text-lg font-bold mb-4">安全書類提出状況</h2>
-        <div className="grid grid-cols-2 gap-2">
+      <div className="bg-white rounded-xl border shadow-sm p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-bold mb-4">安全書類提出状況</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {SAFETY_DOCUMENTS.map((doc) => (
             <div key={doc.id} className="flex items-center justify-between text-sm bg-gray-50 rounded-lg p-2.5">
               <div className="flex items-center gap-2">
