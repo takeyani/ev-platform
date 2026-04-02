@@ -76,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="flex min-h-screen">
           {/* サイドバー: ダークグリーンEVテーマ */}
           <aside className={`
-            fixed lg:sticky top-0 left-0 z-50 h-screen w-64 sidebar-gradient flex flex-col
+            fixed lg:sticky top-0 left-0 z-50 h-screen w-52 sidebar-gradient flex flex-col
             transition-transform duration-200
             lg:translate-x-0
             ${menuOpen ? "translate-x-0" : "-translate-x-full"}
@@ -134,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </aside>
 
           {/* メインコンテンツ */}
-          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>
+          <main className="flex-1 min-w-0 p-3 sm:p-4 lg:p-5">{children}</main>
         </div>
       </body>
     </html>
