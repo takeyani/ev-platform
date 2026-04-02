@@ -189,7 +189,7 @@ CREATE TABLE charger_devices (
 
 ## 3. アプリケーション構成
 
-### 3.1 ページ構成（実装済み 12ページ）
+### 3.1 ページ構成（実装済み 13ページ）
 
 ```
 / (ダッシュボード)         ← 自動集計・アラート・Ready/資材判定
@@ -197,7 +197,7 @@ CREATE TABLE charger_devices (
 ├── /projects (案件管理)
 │   ├── /projects/new (新規登録) ← マスタ連携フォーム
 │   └── /projects/[id] (案件詳細) ← フロー進捗・日程・資材・安全書類
-├── /site-surveys (現場調査)     ← Toyokumo FormBridge連携
+├── /site-surveys (現場調査)     ← Toyokumo連携・撮影ポイント・案件別状況
 ├── /drawings (図面管理)         ← 4種図面 + 3コンポーネント(Canvas描画)
 ├── /construction (施工管理)     ← 施工中/Ready/準備中 + Ready自動判定
 ├── /equipment (充電器管理)      ← 7メーカー・マスタ集計・キュービクル

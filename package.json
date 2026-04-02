@@ -1,8 +1,7 @@
 {
   "name": "ev-platform",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Terra Charge EV充電器施工管理プラットフォーム",
   "scripts": {
     "dev": "next dev --port 3010",
     "build": "next build",
