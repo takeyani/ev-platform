@@ -20,9 +20,29 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold">ダッシュボード</h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">Terra Charge EV充電器施工管理</p>
+      {/* EVヒーローバナー */}
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-600 p-5 sm:p-7">
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 800 200" preserveAspectRatio="none">
+            <circle cx="700" cy="100" r="120" fill="white" />
+            <circle cx="650" cy="50" r="60" fill="white" />
+            <rect x="50" y="140" width="200" height="8" rx="4" fill="white" />
+            <rect x="50" y="160" width="140" height="8" rx="4" fill="white" />
+          </svg>
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/10 flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M13 2L4 14h7l-2 8 9-12h-7l2-8z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h1 className="text-lg sm:text-2xl font-bold text-white">ダッシュボード</h1>
+          </div>
+          <p className="text-emerald-200/80 text-xs sm:text-sm">
+            Terra Charge EV充電器施工管理 &mdash; すべての人とEVにエネルギーを。
+          </p>
+        </div>
       </div>
 
       {/* ステータスカード */}

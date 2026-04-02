@@ -1,19 +1,34 @@
 @import "tailwindcss";
 
-/* テーブルの横スクロール対応 */
+/* EV充電テーマ背景 */
+body {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 50%, #f0f9ff 100%);
+  min-height: 100vh;
+}
+
+/* テーブルの横スクロール */
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
 }
 
-/* テーブルヘッダー固定色 */
 thead th {
   white-space: nowrap;
 }
 
-/* モバイルでのタップ領域拡大 */
+/* モバイルタップ領域 */
 @media (max-width: 768px) {
   table td, table th {
     padding-top: 0.625rem;
     padding-bottom: 0.625rem;
   }
+}
+
+/* カードのモダンシャドウ */
+.shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* サイドバーグラデーション */
+.sidebar-gradient {
+  background: linear-gradient(180deg, #064e3b 0%, #065f46 40%, #047857 100%);
 }
