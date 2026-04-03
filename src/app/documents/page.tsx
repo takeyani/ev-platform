@@ -1,120 +1,74 @@
 import { SAFETY_DOCUMENTS, DRAWING_TYPES, DRAWING_PREFIXES, CHARGER_MANUFACTURERS } from "@/lib/constants";
+import { cell, hcell, section, shead, table, pageTitle, badge, grid2 } from "@/lib/styles";
 
 export default function DocumentsPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">書類管理</h1>
-        <p className="text-sm text-gray-500">施工関連書類・安全書類・図面テンプレート</p>
-      </div>
+    <div>
+      <div style={pageTitle}>📄 書類管理</div>
 
-      {/* 安全書類 */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="font-bold mb-4">安全書類一覧（{SAFETY_DOCUMENTS.length}種類）</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {SAFETY_DOCUMENTS.map((doc) => (
-            <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-2.5">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-gray-400">{doc.id}</span>
-                <span className="text-sm">{doc.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-400">{doc.frequency}</span>
-                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${doc.required === "必須" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"}`}>{doc.required}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 図面種別 */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="font-bold mb-4">図面種別（4種類 × 3段階）</h2>
-        <table className="w-full text-sm">
-          <thead className="border-b">
-            <tr>
-              <th className="text-left py-2 font-medium text-gray-600">図面種別</th>
-              {Object.entries(DRAWING_PREFIXES).map(([key, prefix]) => (
-                <th key={key} className="text-center py-2 font-medium text-gray-600">{prefix || "申請時"}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {DRAWING_TYPES.map((dt) => (
-              <tr key={dt}>
-                <td className="py-2 text-gray-900">{dt}</td>
-                {Object.entries(DRAWING_PREFIXES).map(([key, prefix]) => (
-                  <td key={key} className="py-2 text-center text-xs text-gray-500">{prefix}{dt}</td>
-                ))}
+      <div style={grid2}>
+        {/* 安全書類 */}
+        <div style={section}>
+          <div style={shead}>安全書類（{SAFETY_DOCUMENTS.length}種類）</div>
+          <table style={table}>
+            <thead><tr><th style={hcell}>ID</th><th style={hcell}>書類名</th><th style={hcell}>頻度</th><th style={hcell}>要否</th></tr></thead>
+            <tbody>{SAFETY_DOCUMENTS.map((d) => (
+              <tr key={d.id}>
+                <td style={{ ...cell, fontFamily: "monospace", color: "#9ca3af" }}>{d.id}</td>
+                <td style={cell}>{d.name}</td>
+                <td style={{ ...cell, color: "#9ca3af", fontSize: 10 }}>{d.frequency}</td>
+                <td style={cell}><span style={badge(d.required === "必須" ? "#fee2e2" : "#f3f4f6", d.required === "必須" ? "#b91c1c" : "#6b7280")}>{d.required}</span></td>
               </tr>
-            ))}
-          </tbody>
+            ))}</tbody>
+          </table>
+        </div>
+
+        {/* 図面種別 */}
+        <div style={section}>
+          <div style={shead}>図面種別（4種 × 3段階）</div>
+          <table style={table}>
+            <thead><tr><th style={hcell}>図面</th>{Object.entries(DRAWING_PREFIXES).map(([k, v]) => <th key={k} style={{ ...hcell, textAlign: "center" }}>{v || "申請時"}</th>)}</tr></thead>
+            <tbody>{DRAWING_TYPES.map((dt) => (
+              <tr key={dt}><td style={cell}>{dt}</td>{Object.entries(DRAWING_PREFIXES).map(([k, v]) => <td key={k} style={{ ...cell, textAlign: "center", color: "#6b7280" }}>{v}{dt}</td>)}</tr>
+            ))}</tbody>
+          </table>
+          <div style={{ padding: "4px 8px", fontSize: 9, color: "#9ca3af" }}>対応CAD: DWG, DXF, JWW, TFS</div>
+        </div>
+      </div>
+
+      {/* 施工規則 */}
+      <div style={section}>
+        <div style={shead}>施工関連規則・要領</div>
+        <table style={table}>
+          <thead><tr><th style={hcell}>区分</th><th style={hcell}>書類名</th></tr></thead>
+          <tbody>{[
+            { type: "工事規則", name: "Terra Charge工事要領【第2.1版】" },
+            { type: "急速充電器", name: "Terra Charge急速工事要領【第0.2版】" },
+            { type: "工事規則", name: "Terra Charge 工事規則" },
+            { type: "完了報告", name: "工事完了報告規則" },
+            { type: "現場調査", name: "現地調査規則【第6版】" },
+            { type: "標準仕様", name: "EV充電設備新設工事 標準仕様書Ver1" },
+            { type: "図面", name: "図面作成マニュアル（2026/3/26改訂）" },
+            { type: "図面", name: "図面チェックリスト（2026/2/26改訂）" },
+          ].map((d) => (
+            <tr key={d.name}><td style={{ ...cell, color: "#2563eb", fontWeight: 600 }}>{d.type}</td><td style={cell}>{d.name}</td></tr>
+          ))}</tbody>
         </table>
-        <p className="text-xs text-gray-400 mt-3">対応CADフォーマット: DWG, DXF, JWW, TFS</p>
       </div>
 
-      {/* 施工関連書類 */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="font-bold mb-4">施工関連規則・要領</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { name: "Terra Charge工事要領【第2.1版】", type: "工事規則" },
-            { name: "Terra Charge急速工事要領【第0.2版】", type: "急速充電器" },
-            { name: "Terra Charge 工事規則", type: "工事規則" },
-            { name: "工事完了報告規則", type: "完了報告" },
-            { name: "現地調査規則【第6版】", type: "現場調査" },
-            { name: "EV充電設備新設工事 標準仕様書Ver1", type: "標準仕様" },
-            { name: "図面作成マニュアル（2026/3/26改訂）", type: "図面" },
-            { name: "図面チェックリスト（2026/2/26改訂）", type: "図面" },
-          ].map((doc) => (
-            <div key={doc.name} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{doc.type}</span>
-              <span className="text-sm text-gray-700">{doc.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* メーカー別仕様書 */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="font-bold mb-4">充電器仕様書・断面図</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {CHARGER_MANUFACTURERS.map((m) => (
-            <div key={m.value} className="border rounded-lg p-3">
-              <h3 className="font-medium text-sm mb-1">{m.label}</h3>
-              <div className="flex flex-wrap gap-1">
-                {m.models.map((model) => (
-                  <span key={model} className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{model}</span>
-                ))}
-              </div>
-              <div className="flex gap-1 mt-2">
-                <span className="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded">仕様書</span>
-                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">断面図</span>
-                <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">CAD</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* アプリマニュアル */}
-      <div className="bg-white rounded-xl border shadow-sm p-6">
-        <h2 className="font-bold mb-4">外部ツールマニュアル</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { name: "Kizuku スターターガイド", desc: "工事管理アプリの基本操作" },
-            { name: "Kizuku 協力会社アカウント追加", desc: "アカウント追加手順" },
-            { name: "Toyokumo 導入マニュアル", desc: "フォーム・ワークフロー管理" },
-            { name: "TerraCharge アプリ 立ち上げ試験", desc: "6kW / 3kW / 急速 各マニュアル" },
-            { name: "LED表示マニュアル", desc: "充電器LED状態表示" },
-            { name: "Toyokumo 図面提出マニュアル", desc: "R8図面フロー" },
-          ].map((m) => (
-            <div key={m.name} className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm font-medium text-gray-900">{m.name}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{m.desc}</p>
-            </div>
-          ))}
-        </div>
+      {/* メーカー仕様書 */}
+      <div style={section}>
+        <div style={shead}>充電器仕様書・断面図</div>
+        <table style={table}>
+          <thead><tr><th style={hcell}>メーカー</th><th style={hcell}>対応モデル</th><th style={hcell}>資料</th></tr></thead>
+          <tbody>{CHARGER_MANUFACTURERS.map((m) => (
+            <tr key={m.value}>
+              <td style={{ ...cell, fontWeight: 600 }}>{m.label}</td>
+              <td style={cell}>{m.models.join(", ")}</td>
+              <td style={cell}><span style={badge("#ecfdf5", "#059669")}>仕様書</span> <span style={badge("#eff6ff", "#2563eb")}>断面図</span> <span style={badge("#f5f3ff", "#7c3aed")}>CAD</span></td>
+            </tr>
+          ))}</tbody>
+        </table>
       </div>
     </div>
   );
