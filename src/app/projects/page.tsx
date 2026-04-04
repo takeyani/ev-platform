@@ -1,24 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { STATUS_GROUPS } from "@/lib/constants";
-import type { Project } from "@/lib/constants";
-import { fetchProjects } from "@/lib/db";
-import { SAMPLE_PROJECTS } from "@/lib/constants";
+import { useProjects } from "@/lib/useProjects";
 import { cell, hcell, section, shead, table, pageTitle, link, statusBadge } from "@/lib/styles";
 
 export default function ProjectsPage() {
   const [filter, setFilter] = useState("全て");
-  const [projects, setProjects] = useState<Project[]>(SAMPLE_PROJECTS);
-  const [dbMode, setDbMode] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProjects()
-      .then((data) => { setProjects(data); setDbMode(true); })
-      .catch(() => { /* DB接続失敗時はサンプルデータ */ })
-      .finally(() => setLoading(false));
-  }, []);
+  const { projects, dbMode, loading } = useProjects();
 
   const filtered = projects.filter((p) => {
     if (filter === "全て") return true;
@@ -30,8 +19,7 @@ export default function ProjectsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <div style={pageTitle}>
           📋 案件管理（{filtered.length}件）
-          {dbMode && <span style={{ fontSize: 9, color: "#16a34a", marginLeft: 6 }}>● DB接続中</span>}
-          {!dbMode && !loading && <span style={{ fontSize: 9, color: "#f59e0b", marginLeft: 6 }}>● サンプルデータ</span>}
+          {dbMode && <span style={{ fontSize: 9, color: "#16a34a", marginLeft: 6 }}>● DB</span>}
         </div>
         <Link href="/projects/new" style={{ background: "#059669", color: "white", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 600, textDecoration: "none" }}>新規登録</Link>
       </div>

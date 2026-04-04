@@ -25,7 +25,7 @@ export const badge = (bg: string, color: string): CSSProperties => ({
 
 // 2列グリッド
 export const grid2: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 };
-export const grid3: CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 };
+// grid3は未使用のため削除済み
 
 // ステータスバッジ色（インライン用）
 export const statusStyle: Record<string, { bg: string; color: string }> = {

@@ -38,22 +38,7 @@ export const PROJECT_STATUSES = [
 
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
-export const STATUS_COLORS: Record<ProjectStatus, string> = {
-  "交付決定待ち": "bg-gray-100 text-gray-700",
-  "交付決定済み": "bg-blue-100 text-blue-800",
-  "施工発注済み": "bg-indigo-100 text-indigo-800",
-  "日程調整中": "bg-amber-100 text-amber-800",
-  "着工前会議完了": "bg-teal-100 text-teal-800",
-  "安全書類提出済み": "bg-cyan-100 text-cyan-800",
-  "着工Ready": "bg-lime-100 text-lime-800",
-  "施工中": "bg-emerald-100 text-emerald-800",
-  "完了報告待ち": "bg-orange-100 text-orange-800",
-  "報告書確認中": "bg-purple-100 text-purple-800",
-  "検収完了": "bg-green-100 text-green-800",
-  "請求済み": "bg-gray-100 text-gray-600",
-  "キャンセル": "bg-red-100 text-red-700",
-  "延期": "bg-yellow-100 text-yellow-800",
-};
+// ステータス色はsrc/lib/styles.tsのstatusStyle/statusBadge()を使用
 
 export const STATUS_GROUPS: Record<string, ProjectStatus[]> = {
   "全て": [...PROJECT_STATUSES],
