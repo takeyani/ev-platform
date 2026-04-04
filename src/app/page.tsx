@@ -7,7 +7,7 @@ import { cell, hcell, hcellG, section, shead, table, pageTitle, link, statusBadg
 
 export default function Dashboard() {
   const { projects, dbMode, loading } = useProjects();
-  const summary = getDashboardSummary(projects);
+  const summary = getDashboardSummary(projects, new Date().toISOString().slice(0, 10));
 
   return (
     <div>
