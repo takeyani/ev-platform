@@ -255,7 +255,7 @@ export function getSafetyDocStatus(p: Project): SafetyDocStatus[] {
   const hasSubmission = !!p.safetyDocSubmitDate;
   return SAFETY_DOCUMENTS.map((doc) => ({
     ...doc,
-    submitted: hasSubmission && (doc.required === "必須" ? true : false),
+    submitted: hasSubmission,
   }));
 }
 
@@ -286,7 +286,7 @@ export function getDashboardSummary(projects: Project[], refDate?: string): Dash
       post: active.filter((p) => postStatuses.includes(p.status)).length,
       hold: projects.filter((p) => p.status === "キャンセル" || p.status === "延期").length,
     },
-    readyCount: active.filter((p) => p.readyStatus === "Ready" || checkReadyStatus(p).status === "Ready").length,
+    readyCount: active.filter((p) => checkReadyStatus(p).status === "Ready").length,
     alertCount: allAlerts.length,
     alerts: allAlerts.sort((a, b) => (a.level === "danger" ? -1 : 1)),
     materialPending: active.filter((p) => !getMaterialStatus(p).allConfirmed && p.startDate).length,

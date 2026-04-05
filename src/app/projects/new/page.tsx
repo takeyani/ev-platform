@@ -22,6 +22,8 @@ export default function NewProjectPage() {
     setSaving(true);
     setError("");
     const fd = new FormData(e.currentTarget);
+    const qty = Number(fd.get("qty"));
+    if (!qty || qty < 1) { setError("設置台数は1以上で入力してください"); setSaving(false); return; }
     try {
       invalidateProjectsCache();
       await createProject({

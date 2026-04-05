@@ -359,6 +359,12 @@ CREATE POLICY "contractor_own" ON projects
 - [x] 完了報告の月次サマリーを動的日付に修正（ハードコード解消）
 - [x] スケジュール日付の期限超過色分け（赤:超過, 黄:7日以内, グレー:余裕）
 - [x] ダッシュボード資材ステータス表示を「要確認」テキストに改善
+- [x] フローStep7のstatuses空配列バグ修正（案件が表示されない問題）
+- [x] 安全書類ステータスロジック修正（任意書類が常にfalseだった問題）
+- [x] ダッシュボードreadyCount判定をcheckReadyStatus()に統一
+- [x] 施工関連規則をconstantsに抽出（documents/page.tsxハードコード解消）
+- [x] 図面ページのdynamic importにloading状態追加
+- [x] 新規案件フォームに台数バリデーション追加
 
 ### Phase 3: 次期対応
 - [ ] Kizuku API連携（トーク・報告書・写真）

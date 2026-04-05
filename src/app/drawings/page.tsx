@@ -6,9 +6,10 @@ import { DRAWING_TYPES, DRAWING_PREFIXES } from "@/lib/constants";
 import { useProjects } from "@/lib/useProjects";
 import { cell, hcell, section, shead, table, pageTitle, link, statusBadge } from "@/lib/styles";
 
-const DrawingEditor = dynamic(() => import("@/components/DrawingEditor"), { ssr: false });
-const CrossSectionViewer = dynamic(() => import("@/components/CrossSectionViewer"), { ssr: false });
-const AutoDrawingGenerator = dynamic(() => import("@/components/AutoDrawingGenerator"), { ssr: false });
+const loadingEl = () => <div style={{ padding: 20, textAlign: "center", color: "#9ca3af", fontSize: 12 }}>コンポーネント読み込み中...</div>;
+const DrawingEditor = dynamic(() => import("@/components/DrawingEditor"), { ssr: false, loading: loadingEl });
+const CrossSectionViewer = dynamic(() => import("@/components/CrossSectionViewer"), { ssr: false, loading: loadingEl });
+const AutoDrawingGenerator = dynamic(() => import("@/components/AutoDrawingGenerator"), { ssr: false, loading: loadingEl });
 
 const tabs = [{ id: "manage", label: "📋 管理" }, { id: "auto", label: "🤖 自動生成" }, { id: "editor", label: "📐 エディタ" }, { id: "section", label: "📏 断面図" }] as const;
 type TabId = (typeof tabs)[number]["id"];

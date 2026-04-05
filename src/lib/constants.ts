@@ -160,6 +160,18 @@ export const PRE_CONSTRUCTION_MEETING_ITEMS = [
   { category: "その他打合せ事項", items: ["駐車場工事期間中の車両移動", "荷物の移動・片付け", "入館方法(当日立会・連絡先)", "停電範囲・停電時の注意事項", "エレベーター稼働確認/宅配ボックス影響確認"] },
 ] as const;
 
+// --- 施工関連規則・要領 ---
+export const CONSTRUCTION_REGULATIONS = [
+  { type: "工事規則", name: "Terra Charge工事要領【第2.1版】" },
+  { type: "急速充電器", name: "Terra Charge急速工事要領【第0.2版】" },
+  { type: "工事規則", name: "Terra Charge 工事規則" },
+  { type: "完了報告", name: "工事完了報告規則" },
+  { type: "現場調査", name: "現地調査規則【第6版】" },
+  { type: "標準仕様", name: "EV充電設備新設工事 標準仕様書Ver1" },
+  { type: "図面", name: "図面作成マニュアル（2026/3/26改訂）" },
+  { type: "図面", name: "図面チェックリスト（2026/2/26改訂）" },
+] as const;
+
 // --- 写真チェックシート項目 ---
 export const PHOTO_CHECK_ITEMS = [
   "正面対象車室全台分写真",

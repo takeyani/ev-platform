@@ -1,4 +1,4 @@
-import { SAFETY_DOCUMENTS, DRAWING_TYPES, DRAWING_PREFIXES, CHARGER_MANUFACTURERS } from "@/lib/constants";
+import { SAFETY_DOCUMENTS, DRAWING_TYPES, DRAWING_PREFIXES, CHARGER_MANUFACTURERS, CONSTRUCTION_REGULATIONS } from "@/lib/constants";
 import { cell, hcell, section, shead, table, pageTitle, badge, grid2 } from "@/lib/styles";
 
 export default function DocumentsPage() {
@@ -41,16 +41,7 @@ export default function DocumentsPage() {
         <div style={shead}>施工関連規則・要領</div>
         <table style={table}>
           <thead><tr><th style={hcell}>区分</th><th style={hcell}>書類名</th></tr></thead>
-          <tbody>{[
-            { type: "工事規則", name: "Terra Charge工事要領【第2.1版】" },
-            { type: "急速充電器", name: "Terra Charge急速工事要領【第0.2版】" },
-            { type: "工事規則", name: "Terra Charge 工事規則" },
-            { type: "完了報告", name: "工事完了報告規則" },
-            { type: "現場調査", name: "現地調査規則【第6版】" },
-            { type: "標準仕様", name: "EV充電設備新設工事 標準仕様書Ver1" },
-            { type: "図面", name: "図面作成マニュアル（2026/3/26改訂）" },
-            { type: "図面", name: "図面チェックリスト（2026/2/26改訂）" },
-          ].map((d) => (
+          <tbody>{CONSTRUCTION_REGULATIONS.map((d) => (
             <tr key={d.name}><td style={{ ...cell, color: "#2563eb", fontWeight: 600 }}>{d.type}</td><td style={cell}>{d.name}</td></tr>
           ))}</tbody>
         </table>

@@ -11,7 +11,7 @@ const flowDetails: Record<number, { who: string; what: string; deadline: string;
   4: { who: "案件担当/協力会社", what: "着工前会議・施工日程の調整", deadline: "-", tools: "進捗シート", statuses: ["日程調整中"] },
   5: { who: "三者間", what: "着工前会議（現地/Web/電話）、議事録作成必須", deadline: "議事録: 会議後2営業日以内", tools: "Kizuku", statuses: ["着工前会議完了"] },
   6: { who: "協力会社→Kizuku", what: "安全書類14種を提出（Excel/PDF）", deadline: "着工1週間前まで", tools: "Kizuku", statuses: ["安全書類提出済み"] },
-  7: { who: "テラ&協力会社", what: "充電器発送、QRシール管理、電材確保、産廃手配", deadline: "送付先:1ヶ月前 / 資材:1週間前", tools: "進捗シート", statuses: [] },
+  7: { who: "テラ&協力会社", what: "充電器発送、QRシール管理、電材確保、産廃手配", deadline: "送付先:1ヶ月前 / 資材:1週間前", tools: "進捗シート", statuses: ["安全書類提出済み"] },
   8: { who: "テラ&協力会社", what: "全項目充足で自動Ready判定→テラ確認", deadline: "全項目充足時", tools: "進捗シート(自動)", statuses: ["着工Ready"] },
   9: { who: "協力会社/テラ確認", what: "毎日:開始連絡・写真・終了連絡、変更時:工事中断", deadline: "応答20分なし→電話", tools: "Kizuku/電話", statuses: ["施工中"] },
   10: { who: "協力会社→Kizuku", what: "完了報告書+写真チェックシート+完成図面4種", deadline: "完工後3営業日以内", tools: "Kizuku", statuses: ["完了報告待ち", "報告書確認中"] },
