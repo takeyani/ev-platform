@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getUser, signOut } from "@/lib/auth";
+import { getUserProfile, signOut, getRoleLabel, type UserProfile } from "@/lib/auth";
 import "./globals.css";
 
 const navItems = [
@@ -22,10 +22,10 @@ const navItems = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const pathname = usePathname();
 
-  useEffect(() => { getUser().then(setUser).catch(() => {}); }, []);
+  useEffect(() => { getUserProfile().then(setProfile).catch(() => {}); }, []);
 
   return (
     <html lang="ja">
@@ -64,10 +64,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               })}
             </nav>
             <div style={{ padding: "8px 10px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              {user ? (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 9, color: "rgba(167,243,208,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 120 }}>{user.email}</span>
-                  <button onClick={async () => { await signOut(); setUser(null); }} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(167,243,208,0.6)", fontSize: 9, borderRadius: 3, padding: "2px 6px", cursor: "pointer" }}>ログアウト</button>
+              {profile ? (
+                <div>
+                  <div style={{ fontSize: 9, color: "rgba(167,243,208,0.8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profile.displayName || profile.email}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 2 }}>
+                    <span style={{ fontSize: 8, color: "rgba(167,243,208,0.4)", background: "rgba(255,255,255,0.08)", padding: "1px 4px", borderRadius: 3 }}>{getRoleLabel(profile.role)}</span>
+                    <button onClick={async () => { await signOut(); setProfile(null); }} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(167,243,208,0.5)", fontSize: 9, borderRadius: 3, padding: "2px 6px", cursor: "pointer" }}>ログアウト</button>
+                  </div>
                 </div>
               ) : (
                 <Link href="/login" style={{ display: "block", textAlign: "center", fontSize: 10, color: "rgba(167,243,208,0.5)", textDecoration: "none" }}>ログイン</Link>

@@ -6,6 +6,7 @@ import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, SAMPLE_PROJECTS, PROJECT_STA
 import type { Project } from "@/lib/constants";
 import { fetchProject, updateProject, deleteProject } from "@/lib/db";
 import { suggestNextStatus } from "@/lib/automation";
+import { getUserProfile, canEdit, canDelete, canUploadFiles, type UserProfile } from "@/lib/auth";
 import { cell, hcell, section, shead, table, pageTitle, statusBadge, badge } from "@/lib/styles";
 import FileUploader from "@/components/FileUploader";
 
@@ -17,6 +18,9 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => { getUserProfile().then(setProfile).catch(() => {}); }, []);
 
   function load() {
     setLoading(true);
@@ -89,9 +93,11 @@ export default function ProjectDetailPage() {
             <option value="">手動選択...</option>
             {PROJECT_STATUSES.filter(s => s !== p.status).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <div style={{ marginLeft: "auto" }}>
-            <button onClick={handleDelete} style={{ background: "#dc2626", color: "white", border: "none", borderRadius: 4, padding: "3px 10px", fontSize: 10, cursor: "pointer" }}>案件削除</button>
-          </div>
+          {(!profile || canDelete(profile.role)) && (
+            <div style={{ marginLeft: "auto" }}>
+              <button onClick={handleDelete} style={{ background: "#dc2626", color: "white", border: "none", borderRadius: 4, padding: "3px 10px", fontSize: 10, cursor: "pointer" }}>案件削除</button>
+            </div>
+          )}
         </div>
       </div>
 
