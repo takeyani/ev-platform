@@ -77,10 +77,17 @@ export default function ProjectDetailPage() {
   const currentStep = statusToStep[p.status] ?? 0;
   const nextStatus = suggestNextStatus(p);
 
+  const fieldStyle: React.CSSProperties = { border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%" };
   const dateField = (label: string, value: string, dbField: string) => (
     <tr key={label}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{label}</td><td style={cell}>
       <input type="date" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)}
-        style={{ border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%", color: value ? "#1f2937" : "#f87171" }} />
+        style={{ ...fieldStyle, color: value ? "#1f2937" : "#f87171" }} />
+    </td></tr>
+  );
+  const textField = (label: string, value: string, dbField: string, placeholder?: string) => (
+    <tr key={label}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{label}</td><td style={cell}>
+      <input type="text" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)} placeholder={placeholder}
+        style={{ ...fieldStyle, color: value ? "#1f2937" : "#9ca3af" }} />
     </td></tr>
   );
 
@@ -132,10 +139,14 @@ export default function ProjectDetailPage() {
         <div style={section}><div style={shead}>📅 日程管理（日付をクリックして編集）</div><table style={table}><tbody>
           {dateField("発注日", p.orderDate, "order_date")}
           {dateField("着工前会議", p.preConstructionMeetingDate, "pre_construction_meeting_date")}
+          {textField("会議時間", p.preConstructionMeetingTime, "pre_construction_meeting_time", "10:00")}
           {dateField("安全書類提出", p.safetyDocSubmitDate, "safety_doc_submit_date")}
           {dateField("着工予定日", p.startDate, "start_date")}
           {dateField("完工予定日", p.endDate, "end_date")}
           {dateField("電力受電日", p.powerReceptionDate, "power_reception_date")}
+          {dateField("停電日", p.blackoutDate, "blackout_date")}
+          {textField("停電時間帯", p.blackoutTime, "blackout_time", "09:00-12:00")}
+          {dateField("Ready確認日", p.readyConfirmDate, "ready_confirm_date")}
           <tr><td style={{ ...cell, color: "#6b7280" }}>Ready</td><td style={{ ...cell, fontWeight: 700, color: p.readyStatus === "Ready" ? "#16a34a" : "#d1d5db" }}>{p.readyStatus || "未確認"}</td></tr>
         </tbody></table></div>
 
@@ -148,6 +159,10 @@ export default function ProjectDetailPage() {
           {dateField("実着工日", p.actualStartDate, "actual_start_date")}
           {dateField("実完工日", p.actualEndDate, "actual_end_date")}
           <tr><td style={{ ...cell, color: "#6b7280" }}>産廃</td><td style={cell}>{p.wasteDisposal || "-"} {p.wasteDescription && `(${p.wasteDescription})`}</td></tr>
+          {dateField("産廃回収日", p.wastePickupDate, "waste_pickup_date")}
+          {textField("産廃回収時間", p.wastePickupTime, "waste_pickup_time", "14:00")}
+          {dateField("完了報告日", p.completionReportDate, "completion_report_date")}
+          {dateField("報告書承認日", p.reportApprovalDate, "report_approval_date")}
           <tr><td style={{ ...cell, color: "#6b7280" }}>報告書</td><td style={{ ...cell, fontWeight: 600, color: p.reportStatus === "承認済み" ? "#16a34a" : "#6b7280" }}>{p.reportStatus || "未作成"}</td></tr>
         </tbody></table></div>
       </div>
