@@ -352,6 +352,13 @@ CREATE POLICY "contractor_own" ON projects
 - [x] アクセシビリティ改善（aria-current, aria-label, role="navigation"）
 - [x] 現場調査ページの撮影ポイントをPHOTO_CHECK_ITEMSからimport（ハードコード解消）
 - [x] 型安全性向上（as any → Project["status"]）
+- [x] テーブル全体の横スクロール対応（CSSグローバル）
+- [x] モバイル時グリッド自動1列化
+- [x] フォームフォーカス表示（緑ボーダー+シャドウ）
+- [x] ログインフォームのアクセシビリティ（htmlFor/id対応）
+- [x] 完了報告の月次サマリーを動的日付に修正（ハードコード解消）
+- [x] スケジュール日付の期限超過色分け（赤:超過, 黄:7日以内, グレー:余裕）
+- [x] ダッシュボード資材ステータス表示を「要確認」テキストに改善
 
 ### Phase 3: 次期対応
 - [ ] Kizuku API連携（トーク・報告書・写真）

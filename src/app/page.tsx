@@ -75,7 +75,7 @@ export default function Dashboard() {
                 <td style={{ ...cell, color: "#9ca3af" }}>{p.startDate || "-"}</td>
                 <td style={cell}><span style={statusBadge(p.status)}>{p.status}</span></td>
                 <td style={{ ...cell, textAlign: "center", fontWeight: 600, color: ready.status === "Ready" ? "#16a34a" : "#f87171" }}>{ready.status === "Ready" ? "✓" : ready.items.filter(i => !i.ok).length || "-"}</td>
-                <td style={{ ...cell, textAlign: "center", fontWeight: 600, color: mat.allConfirmed ? "#16a34a" : !p.startDate ? "#d1d5db" : "#f59e0b" }}>{mat.allConfirmed ? "✓" : !p.startDate ? "-" : "!"}</td>
+                <td style={{ ...cell, textAlign: "center", fontWeight: 600, fontSize: 10, color: mat.allConfirmed ? "#16a34a" : !p.startDate ? "#d1d5db" : "#f59e0b" }}>{mat.allConfirmed ? "✓" : !p.startDate ? "-" : "要確認"}</td>
               </tr>);
             })}</tbody>
           </table>

@@ -46,19 +46,19 @@ export default function LoginPage() {
 
             {isSignUp && (
               <div style={{ marginBottom: 8 }}>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>表示名</label>
-                <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
+                <label htmlFor="displayName" style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>表示名</label>
+                <input id="displayName" type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
                   style={{ width: "100%", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 12, boxSizing: "border-box" }} placeholder="山田太郎" />
               </div>
             )}
             <div style={{ marginBottom: 8 }}>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>メールアドレス</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+              <label htmlFor="email" style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>メールアドレス</label>
+              <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
                 style={{ width: "100%", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 12, boxSizing: "border-box" }} />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>パスワード</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+              <label htmlFor="password" style={{ fontSize: 11, fontWeight: 600, color: "#374151", display: "block", marginBottom: 2 }}>パスワード</label>
+              <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
                 style={{ width: "100%", padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 12, boxSizing: "border-box" }} />
             </div>
 

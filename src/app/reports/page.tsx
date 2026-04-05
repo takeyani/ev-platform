@@ -7,7 +7,8 @@ import { cell, hcell, hcellG, section, shead, table, pageTitle, link, statusBadg
 
 export default function ReportsPage() {
   const { projects, loading } = useProjects();
-  const summary = getMonthlyInspectionSummary(projects, 2026, 4);
+  const now = new Date();
+  const summary = getMonthlyInspectionSummary(projects, now.getFullYear(), now.getMonth() + 1);
   const reportProjects = projects.filter((p) => !["キャンセル", "延期", "交付決定待ち", "交付決定済み"].includes(p.status));
   if (loading) return <div style={pageTitle}>✅ 完了報告<br/><span style={{ fontSize: 11, color: "#9ca3af" }}>読み込み中...</span></div>;
   return (

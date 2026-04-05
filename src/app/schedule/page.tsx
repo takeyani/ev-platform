@@ -4,6 +4,14 @@ import { checkReadyStatus, getMaterialStatus } from "@/lib/automation";
 import { useProjects } from "@/lib/useProjects";
 import { cell, hcell, hcellG, section, shead, table, pageTitle, link, statusBadge } from "@/lib/styles";
 
+function dateColor(dateStr: string): string {
+  if (!dateStr) return "#9ca3af";
+  const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
+  if (diff < 0) return "#dc2626";
+  if (diff <= 7) return "#f59e0b";
+  return "#6b7280";
+}
+
 export default function SchedulePage() {
   const { projects: allProjects, loading } = useProjects();
   const projects = allProjects.filter((p) => p.status !== "キャンセル" && p.status !== "延期");
@@ -19,9 +27,9 @@ export default function SchedulePage() {
         <td style={cell}><span style={statusBadge(p.status)}>{p.status}</span></td>
         <td style={cell}>{p.preConstructionMeetingDate||"-"}</td>
         <td style={cell}>{p.safetyDocSubmitDate?<span style={{color:"#16a34a"}}>{p.safetyDocSubmitDate}</span>:<span style={{color:"#f87171"}}>未提出</span>}</td>
-        <td style={{...cell,fontWeight:600}}>{p.startDate||"-"}</td><td style={cell}>{p.endDate||"-"}</td>
+        <td style={{...cell,fontWeight:600,color:dateColor(p.startDate)}}>{p.startDate||"-"}</td><td style={{...cell,color:dateColor(p.endDate)}}>{p.endDate||"-"}</td>
         <td style={cell}>{p.blackoutDate?`${p.blackoutDate} ${p.blackoutTime}`:"-"}</td>
-        <td style={cell}>{p.powerReceptionDate||"-"}</td>
+        <td style={{...cell,color:dateColor(p.powerReceptionDate)}}>{p.powerReceptionDate||"-"}</td>
         <td style={{...cell,textAlign:"center",fontWeight:700,color:rc.status==="Ready"?"#16a34a":"#d1d5db"}}>{rc.status==="Ready"?"✓":"-"}</td>
         <td style={{...cell,textAlign:"center",fontWeight:700,color:mat.allConfirmed?"#16a34a":"#f59e0b"}}>{mat.allConfirmed?"✓":"!"}</td>
       </tr>})}</tbody></table></div></div>

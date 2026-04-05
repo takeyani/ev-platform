@@ -11,13 +11,20 @@ body {
   min-height: 100vh;
 }
 
-/* テーブル共通 */
-.overflow-x-auto { -webkit-overflow-scrolling: touch; }
+/* テーブル共通: 全テーブルを横スクロール可能に */
+table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 thead th { white-space: nowrap; }
 
 /* テーブル行のストライプ */
 tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.015); }
 tbody tr:hover { background-color: rgba(16, 185, 129, 0.04) !important; }
+
+/* フォーカス表示 */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+}
 
 /* サイドバー（デスクトップ） */
 .sidebar {
@@ -42,6 +49,11 @@ tbody tr:hover { background-color: rgba(16, 185, 129, 0.04) !important; }
 /* モバイル対応 */
 @media (max-width: 768px) {
   table td, table th { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+  /* グリッドを1列に */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
 
   .mobile-header {
     display: flex;
