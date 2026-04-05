@@ -325,20 +325,28 @@ CREATE POLICY "contractor_own" ON projects
 
 ### Phase 2: DB連携 ✅ 完了
 - [x] Supabase DB接続（supabase.ts + db.ts）
-- [x] projectsテーブル作成（48フィールド）
-- [x] 案件CRUD（fetchProjects/fetchProject/createProject/updateProject）
-- [x] useProjects()フック（キャッシュ付き、フォールバック対応）
-- [x] 全ページDB連動（useProjects()経由）
-- [x] 案件詳細: ステータス変更・日程インライン編集
+- [x] projectsテーブル作成（48フィールド、camelCase↔snake_case自動変換）
+- [x] 案件CRUD（fetch/create/update/delete + エラーメッセージ日本語化）
+- [x] useProjects()フック（キャッシュ + invalidateProjectsCache()でグローバル無効化）
+- [x] 全ページDB連動（useProjects()経由、mutation後自動リフレッシュ）
+- [x] 案件詳細: ステータス変更・日程インライン編集・実着工/完工日編集
 - [x] 業務フロー: DB案件数リアルタイム連動
 - [x] Vercel環境変数設定・本番デプロイ
 
+### Phase 2.5: ファイル・認証・権限 ✅ 完了
+- [x] Supabase Storage（drawings/documents/photos 3バケット）
+- [x] FileUploaderコンポーネント（アップロード・一覧・ダウンロード・削除 + エラーハンドリング）
+- [x] 認証（Supabase Auth: signIn/signUp/signOut）
+- [x] ロール権限5種（admin/terra_case/terra_const/contractor/manufacturer）
+- [x] user_profilesテーブル + 自動トリガー
+- [x] ロール別UI制御（削除ボタンはadminのみ等）
+- [x] 案件詳細に図面・書類・写真アップロード統合
+- [x] 案件削除（確認ダイアログ付き）
+
 ### Phase 3: 次期対応
-- [ ] 認証・権限管理（テラ社員 / 協力会社）
-- [ ] ファイルアップロード（Supabase Storage - 図面・写真）
 - [ ] Kizuku API連携（トーク・報告書・写真）
 - [ ] Toyokumo連携（現調フォーム・図面提出）
-- [ ] 案件削除機能（deleteProject()は実装済み、UI未実装）
+- [ ] 検索・ページネーション
 
 ### Phase 4: 高度機能
 - [ ] モバイル最適化（レスポンシブ強化）

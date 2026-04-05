@@ -35,7 +35,12 @@ export default function FileUploader({ bucket, folder, label, accept }: Props) {
 
   async function handleDelete(path: string, name: string) {
     if (!confirm(`${name} を削除しますか？`)) return;
-    try { await deleteFile(bucket, path); load(); } catch {}
+    try {
+      await deleteFile(bucket, path);
+      setMsg(`✅ ${name} を削除しました`);
+      load();
+      setTimeout(() => setMsg(""), 2000);
+    } catch (err: any) { setMsg(`❌ 削除失敗: ${err.message}`); }
   }
 
   return (

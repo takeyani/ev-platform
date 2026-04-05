@@ -92,9 +92,9 @@ export function getDeadlineAlerts(p: Project, refDate?: string): Alert[] {
   // 1. 安全書類: 着工1週間前までに提出
   if (p.startDate && !p.safetyDocSubmitDate) {
     const daysToStart = daysBetween(ref, p.startDate);
-    if (daysToStart <= 7 && daysToStart > 0) {
+    if (daysToStart !== Infinity && daysToStart <= 7 && daysToStart > 0) {
       alerts.push({ ...base, level: "danger", message: "安全書類未提出（着工1週間前）", dueDate: p.startDate });
-    } else if (daysToStart <= 14 && daysToStart > 7) {
+    } else if (daysToStart !== Infinity && daysToStart <= 14 && daysToStart > 7) {
       alerts.push({ ...base, level: "warning", message: "安全書類提出期限が近づいています", dueDate: p.startDate });
     }
   }
@@ -102,7 +102,7 @@ export function getDeadlineAlerts(p: Project, refDate?: string): Alert[] {
   // 2. 資材: 着工1週間前までに全確保
   if (p.startDate && !p.materialConfirmDate) {
     const daysToStart = daysBetween(ref, p.startDate);
-    if (daysToStart <= 7 && daysToStart > 0) {
+    if (daysToStart !== Infinity && daysToStart <= 7 && daysToStart > 0) {
       alerts.push({ ...base, level: "danger", message: "電材未確保（着工1週間前）", dueDate: p.startDate });
     }
   }

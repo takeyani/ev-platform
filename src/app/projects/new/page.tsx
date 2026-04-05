@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CHARGER_CATEGORIES, CHARGER_MANUFACTURERS, SUBSIDY_TYPES, APPLICATION_CATEGORIES, CONSTRUCTION_AREAS } from "@/lib/constants";
 import { createProject } from "@/lib/db";
+import { invalidateProjectsCache } from "@/lib/useProjects";
 import { section, shead, pageTitle } from "@/lib/styles";
 
 const labelStyle: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "#374151", padding: "6px 8px", verticalAlign: "top", width: "30%" };
@@ -22,6 +23,7 @@ export default function NewProjectPage() {
     setError("");
     const fd = new FormData(e.currentTarget);
     try {
+      invalidateProjectsCache();
       await createProject({
         caseId: fd.get("caseId"),
         nevId: fd.get("nevId"),

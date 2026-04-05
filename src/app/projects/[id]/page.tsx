@@ -5,10 +5,16 @@ import Link from "next/link";
 import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, SAMPLE_PROJECTS, PROJECT_STATUSES } from "@/lib/constants";
 import type { Project } from "@/lib/constants";
 import { fetchProject, updateProject, deleteProject } from "@/lib/db";
+import { invalidateProjectsCache } from "@/lib/useProjects";
 import { suggestNextStatus } from "@/lib/automation";
-import { getUserProfile, canEdit, canDelete, canUploadFiles, type UserProfile } from "@/lib/auth";
+import { getUserProfile, canDelete, type UserProfile } from "@/lib/auth";
 import { cell, hcell, section, shead, table, pageTitle, statusBadge, badge } from "@/lib/styles";
 import FileUploader from "@/components/FileUploader";
+
+const btn = (bg: string, color: string = "white"): React.CSSProperties => ({
+  background: bg, color, border: "none", borderRadius: 4, padding: "4px 12px",
+  fontSize: 11, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-block",
+});
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -20,8 +26,6 @@ export default function ProjectDetailPage() {
   const [msg, setMsg] = useState("");
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
-  useEffect(() => { getUserProfile().then(setProfile).catch(() => {}); }, []);
-
   function load() {
     setLoading(true);
     fetchProject(id)
@@ -30,26 +34,29 @@ export default function ProjectDetailPage() {
       .finally(() => setLoading(false));
   }
   useEffect(load, [id]);
+  useEffect(() => { getUserProfile().then(setProfile).catch(() => {}); }, []);
 
   async function changeStatus(newStatus: string) {
     if (!p) return;
     setSaving(true); setMsg("");
     try {
       await updateProject(p.id, { status: newStatus });
+      invalidateProjectsCache();
       setP({ ...p, status: newStatus as any });
-      setMsg(`✅ ${newStatus} に更新`);
+      setMsg(`✅ ${newStatus} に更新しました`);
       setTimeout(() => setMsg(""), 3000);
     } catch (e: any) { setMsg(`❌ ${e.message}`); }
     finally { setSaving(false); }
   }
 
-  async function updateField(field: string, value: string) {
+  async function saveField(dbField: string, value: string) {
     if (!p) return;
     setSaving(true);
     try {
-      await updateProject(p.id, { [field]: value || null });
-      setP({ ...p, [field.replace(/_([a-z])/g, (_, c) => c.toUpperCase())]: value } as any);
-      setMsg("✅ 更新"); setTimeout(() => setMsg(""), 2000);
+      await updateProject(p.id, { [dbField]: value || null });
+      invalidateProjectsCache();
+      load(); // reload from DB
+      setMsg("✅ 保存しました"); setTimeout(() => setMsg(""), 2000);
     } catch (e: any) { setMsg(`❌ ${e.message}`); }
     finally { setSaving(false); }
   }
@@ -58,45 +65,54 @@ export default function ProjectDetailPage() {
     if (!p || !confirm(`「${p.name}」を削除しますか？この操作は取り消せません。`)) return;
     try {
       await deleteProject(p.id);
+      invalidateProjectsCache();
       router.push("/projects");
     } catch (e: any) { setMsg(`❌ ${e.message}`); }
   }
 
   if (loading) return <div style={pageTitle}>読み込み中...</div>;
-  if (!p) return <div style={pageTitle}>案件が見つかりません</div>;
+  if (!p) return <div style={{ textAlign: "center", padding: 40 }}><div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>案件が見つかりません</div><Link href="/projects" style={{ color: "#059669" }}>← 案件一覧に戻る</Link></div>;
 
   const statusToStep: Record<string, number> = { "交付決定待ち": 0, "交付決定済み": 1, "施工発注済み": 3, "日程調整中": 4, "着工前会議完了": 5, "安全書類提出済み": 6, "着工Ready": 8, "施工中": 9, "完了報告待ち": 10, "報告書確認中": 10, "検収完了": 11, "請求済み": 11 };
   const currentStep = statusToStep[p.status] ?? 0;
   const nextStatus = suggestNextStatus(p);
 
-  const infoRows = [["充電器種別", p.chargerCategory], ["メーカー/型番", `${p.chargerManufacturer} ${p.chargerModel}`], ["設置台数", `${p.quantity}台`], ["施工会社", p.contractor], ["補助金", p.subsidyType], ["申請区分", p.applicationCategory], ["案件担当", p.caseManager], ["施工管理", p.constructionManager]];
-  const schedRows: [string, string, string][] = [["発注日", p.orderDate, "order_date"], ["着工前会議", p.preConstructionMeetingDate, "pre_construction_meeting_date"], ["安全書類提出", p.safetyDocSubmitDate, "safety_doc_submit_date"], ["着工予定日", p.startDate, "start_date"], ["完工予定日", p.endDate, "end_date"], ["電力受電日", p.powerReceptionDate, "power_reception_date"]];
-  const matRows: [string, string, string][] = [["充電器納品確認", p.chargerDeliveryConfirmDate, "charger_delivery_confirm_date"], ["電材確保確認", p.materialConfirmDate, "material_confirm_date"]];
+  const dateField = (label: string, value: string, dbField: string) => (
+    <tr key={label}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{label}</td><td style={cell}>
+      <input type="date" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)}
+        style={{ border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%", color: value ? "#1f2937" : "#f87171" }} />
+    </td></tr>
+  );
 
   return (
     <div>
-      <Link href="/projects" style={{ fontSize: 11, color: "#059669", textDecoration: "none" }}>&larr; 案件一覧</Link>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", margin: "6px 0 8px" }}>
-        <div><div style={{ fontSize: 10, color: "#9ca3af" }}>{p.caseId} | {p.subsidyType}</div><div style={{ fontSize: 15, fontWeight: 700 }}>{p.name}</div><div style={{ fontSize: 10, color: "#6b7280" }}>{p.location}</div></div>
+      {/* ヘッダー */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+        <Link href="/projects" style={btn("#e5e7eb", "#374151")}>← 案件一覧</Link>
+        <Link href="/drawings" style={btn("#eff6ff", "#2563eb")}>📐 図面管理</Link>
+        <Link href="/safety" style={btn("#fef3c7", "#92400e")}>🦺 安全書類</Link>
+        <Link href="/reports" style={btn("#f0fdf4", "#166534")}>✅ 完了報告</Link>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+        <div><div style={{ fontSize: 10, color: "#9ca3af" }}>{p.caseId} | {p.subsidyType} | {p.constructionArea}</div><div style={{ fontSize: 15, fontWeight: 700 }}>{p.name}</div><div style={{ fontSize: 10, color: "#6b7280" }}>{p.location}</div></div>
         <div style={{ textAlign: "right" }}>
           <span style={statusBadge(p.status)}>{p.status}</span>
           {msg && <div style={{ fontSize: 10, marginTop: 4, color: msg.startsWith("✅") ? "#16a34a" : "#dc2626" }}>{msg}</div>}
         </div>
       </div>
 
-      {/* ステータス変更 + 削除 */}
+      {/* ステータス変更バー */}
       <div style={{ ...section, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <div style={{ padding: "6px 10px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "#1e40af" }}>ステータス:</span>
-          {nextStatus && <button onClick={() => changeStatus(nextStatus)} disabled={saving} style={{ background: "#059669", color: "white", border: "none", borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>→ {nextStatus}（推奨）</button>}
-          <select onChange={(e) => { if (e.target.value) changeStatus(e.target.value); e.target.value = ""; }} style={{ fontSize: 11, border: "1px solid #bfdbfe", borderRadius: 4, padding: "2px 6px" }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "#1e40af" }}>ステータス変更:</span>
+          {nextStatus && <button onClick={() => changeStatus(nextStatus)} disabled={saving} style={btn("#059669")}>→ {nextStatus}（推奨）</button>}
+          <select onChange={(e) => { if (e.target.value) changeStatus(e.target.value); e.target.value = ""; }} style={{ fontSize: 11, border: "1px solid #bfdbfe", borderRadius: 4, padding: "3px 6px" }}>
             <option value="">手動選択...</option>
             {PROJECT_STATUSES.filter(s => s !== p.status).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
           {(!profile || canDelete(profile.role)) && (
-            <div style={{ marginLeft: "auto" }}>
-              <button onClick={handleDelete} style={{ background: "#dc2626", color: "white", border: "none", borderRadius: 4, padding: "3px 10px", fontSize: 10, cursor: "pointer" }}>案件削除</button>
-            </div>
+            <button onClick={handleDelete} style={{ ...btn("#dc2626"), marginLeft: "auto" }}>🗑 案件削除</button>
           )}
         </div>
       </div>
@@ -109,29 +125,39 @@ export default function ProjectDetailPage() {
       {/* 3列: 案件情報 / 日程 / 資材 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
         <div style={section}><div style={shead}>案件情報</div><table style={table}><tbody>
-          {infoRows.map(([k, v]) => <tr key={k}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{k}</td><td style={{ ...cell, fontWeight: 500 }}>{v || "-"}</td></tr>)}
+          {[["充電器", p.chargerCategory], ["メーカー", `${p.chargerManufacturer} ${p.chargerModel}`], ["台数", `${p.quantity}台`], ["施工会社", p.contractor], ["補助金", p.subsidyType], ["申請区分", p.applicationCategory], ["案件担当", p.caseManager], ["施工管理", p.constructionManager]].map(([k, v]) => <tr key={k}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{k}</td><td style={{ ...cell, fontWeight: 500 }}>{v || "-"}</td></tr>)}
           {p.notes && <tr><td style={{ ...cell, color: "#6b7280" }}>備考</td><td style={cell}>{p.notes}</td></tr>}
         </tbody></table></div>
-        <div style={section}><div style={shead}>日程管理</div><table style={table}><tbody>
-          {schedRows.map(([k, v, field]) => <tr key={k}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{k}</td><td style={cell}><input type="date" defaultValue={v || ""} onBlur={(e) => updateField(field, e.target.value)} style={{ border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%", color: v ? "#1f2937" : "#f87171" }} /></td></tr>)}
+
+        <div style={section}><div style={shead}>📅 日程管理（日付をクリックして編集）</div><table style={table}><tbody>
+          {dateField("発注日", p.orderDate, "order_date")}
+          {dateField("着工前会議", p.preConstructionMeetingDate, "pre_construction_meeting_date")}
+          {dateField("安全書類提出", p.safetyDocSubmitDate, "safety_doc_submit_date")}
+          {dateField("着工予定日", p.startDate, "start_date")}
+          {dateField("完工予定日", p.endDate, "end_date")}
+          {dateField("電力受電日", p.powerReceptionDate, "power_reception_date")}
           <tr><td style={{ ...cell, color: "#6b7280" }}>Ready</td><td style={{ ...cell, fontWeight: 700, color: p.readyStatus === "Ready" ? "#16a34a" : "#d1d5db" }}>{p.readyStatus || "未確認"}</td></tr>
         </tbody></table></div>
-        <div style={section}><div style={shead}>資材・完了</div><table style={table}><tbody>
-          {matRows.map(([k, v, field]) => <tr key={k}><td style={{ ...cell, color: "#6b7280" }}>{k}</td><td style={cell}><input type="date" defaultValue={v || ""} onBlur={(e) => updateField(field, e.target.value)} style={{ border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%", color: v ? "#1f2937" : "#f87171" }} /></td></tr>)}
-          <tr><td style={{ ...cell, color: "#6b7280" }}>産廃</td><td style={cell}>{p.wasteDisposal || "-"}</td></tr>
+
+        <div style={section}><div style={shead}>📦 資材・完了報告</div><table style={table}><tbody>
+          {dateField("充電器納品確認", p.chargerDeliveryConfirmDate, "charger_delivery_confirm_date")}
+          {dateField("電材確保確認", p.materialConfirmDate, "material_confirm_date")}
+          {dateField("実着工日", p.actualStartDate, "actual_start_date")}
+          {dateField("実完工日", p.actualEndDate, "actual_end_date")}
+          <tr><td style={{ ...cell, color: "#6b7280" }}>産廃</td><td style={cell}>{p.wasteDisposal || "-"} {p.wasteDescription && `(${p.wasteDescription})`}</td></tr>
           <tr><td style={{ ...cell, color: "#6b7280" }}>報告書</td><td style={{ ...cell, fontWeight: 600, color: p.reportStatus === "承認済み" ? "#16a34a" : "#6b7280" }}>{p.reportStatus || "未作成"}</td></tr>
         </tbody></table></div>
       </div>
 
       {/* ファイルアップロード 3列 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
-        <FileUploader bucket="drawings" folder={p.caseId} label="図面" accept=".pdf,.png,.jpg,.dwg,.dxf" />
-        <FileUploader bucket="documents" folder={p.caseId} label="安全書類" accept=".pdf,.xlsx,.xls,.doc,.docx" />
-        <FileUploader bucket="photos" folder={p.caseId} label="工事写真" accept=".jpg,.jpeg,.png,.heic" />
+        <FileUploader bucket="drawings" folder={p.caseId} label="📐 図面ファイル" accept=".pdf,.png,.jpg,.dwg,.dxf" />
+        <FileUploader bucket="documents" folder={p.caseId} label="📄 安全書類" accept=".pdf,.xlsx,.xls,.doc,.docx" />
+        <FileUploader bucket="photos" folder={p.caseId} label="📷 工事写真" accept=".jpg,.jpeg,.png,.heic" />
       </div>
 
-      {/* 安全書類 */}
-      <div style={section}><div style={shead}>安全書類チェック（{SAFETY_DOCUMENTS.length}種類）</div><table style={table}><thead><tr><th style={hcell}>ID</th><th style={hcell}>書類名</th><th style={hcell}>頻度</th><th style={hcell}>要否</th></tr></thead><tbody>{SAFETY_DOCUMENTS.map((d) => <tr key={d.id}><td style={{ ...cell, fontFamily: "monospace", color: "#9ca3af" }}>{d.id}</td><td style={cell}>{d.name}</td><td style={{ ...cell, color: "#9ca3af", fontSize: 10 }}>{d.frequency}</td><td style={cell}><span style={badge(d.required === "必須" ? "#fee2e2" : "#f3f4f6", d.required === "必須" ? "#b91c1c" : "#6b7280")}>{d.required}</span></td></tr>)}</tbody></table></div>
+      {/* 安全書類チェック */}
+      <div style={section}><div style={shead}>🦺 安全書類チェック（{SAFETY_DOCUMENTS.length}種類）— <Link href="/safety" style={{ color: "#059669", textDecoration: "none", fontSize: 10 }}>安全書類管理ページへ →</Link></div><table style={table}><thead><tr><th style={hcell}>ID</th><th style={hcell}>書類名</th><th style={hcell}>頻度</th><th style={hcell}>要否</th></tr></thead><tbody>{SAFETY_DOCUMENTS.map((d) => <tr key={d.id}><td style={{ ...cell, fontFamily: "monospace", color: "#9ca3af" }}>{d.id}</td><td style={cell}>{d.name}</td><td style={{ ...cell, color: "#9ca3af", fontSize: 10 }}>{d.frequency}</td><td style={cell}><span style={badge(d.required === "必須" ? "#fee2e2" : "#f3f4f6", d.required === "必須" ? "#b91c1c" : "#6b7280")}>{d.required}</span></td></tr>)}</tbody></table></div>
     </div>
   );
 }
