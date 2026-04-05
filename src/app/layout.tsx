@@ -36,19 +36,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="text-gray-900" style={{ background: "linear-gradient(135deg, #f0fdf4, #ecfeff, #f0f9ff)", backgroundAttachment: "fixed" }}>
         <div style={{ display: "flex", minHeight: "100vh" }}>
-          {/* 左サイドバー: 常時表示 */}
-          <aside style={{ width: 200, minWidth: 200, background: "linear-gradient(180deg, #064e3b, #065f46, #047857)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh", overflow: "auto" }}>
+          {/* モバイルヘッダー */}
+          <div className="mobile-header">
+            <button onClick={() => setMenuOpen(!menuOpen)} aria-label="メニュー" style={{ background: "none", border: "none", color: "white", fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>☰</button>
+            <span style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>⚡ EV Platform</span>
+          </div>
+          {/* オーバーレイ */}
+          {menuOpen && <div className="sidebar-overlay" onClick={() => setMenuOpen(false)} />}
+          {/* 左サイドバー */}
+          <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} style={{ background: "linear-gradient(180deg, #064e3b, #065f46, #047857)", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
               <div style={{ color: "white", fontWeight: "bold", fontSize: 14 }}>⚡ EV Platform</div>
               <div style={{ color: "rgba(167,243,208,0.6)", fontSize: 10 }}>充電器施工管理</div>
             </div>
-            <nav style={{ flex: 1, padding: "6px 8px" }}>
+            <nav role="navigation" aria-label="メインナビゲーション" style={{ flex: 1, padding: "6px 8px" }}>
               {navItems.map((item) => {
                 const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    aria-current={active ? "page" : undefined}
                     style={{
                       display: "flex", alignItems: "center", gap: 8,
                       padding: "7px 10px", marginBottom: 1, borderRadius: 6,
@@ -69,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <div style={{ fontSize: 9, color: "rgba(167,243,208,0.8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profile.displayName || profile.email}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 2 }}>
                     <span style={{ fontSize: 8, color: "rgba(167,243,208,0.4)", background: "rgba(255,255,255,0.08)", padding: "1px 4px", borderRadius: 3 }}>{getRoleLabel(profile.role)}</span>
-                    <button onClick={async () => { await signOut(); setProfile(null); }} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(167,243,208,0.5)", fontSize: 9, borderRadius: 3, padding: "2px 6px", cursor: "pointer" }}>ログアウト</button>
+                    <button onClick={async () => { await signOut(); setProfile(null); }} aria-label="ログアウト" style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(167,243,208,0.5)", fontSize: 9, borderRadius: 3, padding: "2px 6px", cursor: "pointer" }}>ログアウト</button>
                   </div>
                 </div>
               ) : (

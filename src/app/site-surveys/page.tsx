@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useProjects } from "@/lib/useProjects";
+import { PHOTO_CHECK_ITEMS } from "@/lib/constants";
 import { cell, hcell, hcellG, section, shead, table, pageTitle, link, statusBadge } from "@/lib/styles";
 
 export default function SiteSurveysPage() {
@@ -27,7 +28,7 @@ export default function SiteSurveysPage() {
         <td style={cell}>{p.preConstructionMeetingDate?<span style={{color:"#16a34a"}}>{p.preConstructionMeetingDate}</span>:<span style={{color:"#d1d5db"}}>未実施</span>}</td>
         <td style={cell}>{p.contractor}</td>
       </tr>)}</tbody></table></div>
-      <div style={section}><div style={shead}>撮影ポイント</div><table style={table}><tbody>{["電源盤全体写真・盤名","スマートメーター接写","主幹ブレーカ容量・RT相電流値","分岐ブレーカ用途の名称・仕様","配線ルート","コア抜き箇所","架空距離","埋設配管","看板（商業施設のみ）","駐車場写真（個別+全体）","ポール式の場合、基礎設置床面"].map((item)=><tr key={item}><td style={cell}>☐ {item}</td></tr>)}</tbody></table></div>
+      <div style={section}><div style={shead}>撮影ポイント（{PHOTO_CHECK_ITEMS.length}項目）</div><table style={table}><tbody>{PHOTO_CHECK_ITEMS.map((item)=><tr key={item}><td style={cell}>☐ {item}</td></tr>)}</tbody></table></div>
     </div>
   );
 }

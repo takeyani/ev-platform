@@ -7,11 +7,16 @@ import { cell, hcell, section, shead, table, pageTitle, link, statusBadge } from
 
 export default function ProjectsPage() {
   const [filter, setFilter] = useState("全て");
+  const [search, setSearch] = useState("");
   const { projects, dbMode, loading } = useProjects();
 
   const filtered = projects.filter((p) => {
-    if (filter === "全て") return true;
-    return STATUS_GROUPS[filter]?.includes(p.status);
+    if (filter !== "全て" && !STATUS_GROUPS[filter]?.includes(p.status)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return p.name.toLowerCase().includes(q) || p.caseId.toLowerCase().includes(q) || p.contractor.toLowerCase().includes(q) || p.prefecture.toLowerCase().includes(q) || p.chargerManufacturer.toLowerCase().includes(q);
+    }
+    return true;
   });
 
   return (
@@ -21,7 +26,10 @@ export default function ProjectsPage() {
           📋 案件管理（{filtered.length}件）
           {dbMode && <span style={{ fontSize: 9, color: "#16a34a", marginLeft: 6 }}>● DB</span>}
         </div>
-        <Link href="/projects/new" style={{ background: "#059669", color: "white", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 600, textDecoration: "none" }}>新規登録</Link>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="案件名・ID・施工会社で検索..." style={{ padding: "4px 10px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 11, width: 220 }} />
+          <Link href="/projects/new" style={{ background: "#059669", color: "white", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 600, textDecoration: "none" }}>新規登録</Link>
+        </div>
       </div>
       <div style={{ display: "flex", gap: 4, marginBottom: 8, flexWrap: "wrap" }}>
         {Object.keys(STATUS_GROUPS).map((f) => (

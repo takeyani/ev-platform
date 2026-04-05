@@ -346,6 +346,12 @@ CREATE POLICY "contractor_own" ON projects
 - [x] 案件詳細に配送依頼日（充電器・看板）・看板納品確認日の編集UI追加
 - [x] useProjectsエラーログ出力追加
 - [x] 案件詳細に全日付・時刻フィールドの編集UI追加（停電日時・会議時間・産廃回収・完了報告・承認日等）
+- [x] RBAC適用（canEdit/canUploadFiles/canViewAllProjects — 編集・アップロード・ステータス変更を権限制御）
+- [x] 案件一覧にテキスト検索（案件名・ID・施工会社・都道府県・メーカー）
+- [x] モバイルレスポンシブ対応（ハンバーガーメニュー・サイドバースライド・メディアクエリ）
+- [x] アクセシビリティ改善（aria-current, aria-label, role="navigation"）
+- [x] 現場調査ページの撮影ポイントをPHOTO_CHECK_ITEMSからimport（ハードコード解消）
+- [x] 型安全性向上（as any → Project["status"]）
 
 ### Phase 3: 次期対応
 - [ ] Kizuku API連携（トーク・報告書・写真）

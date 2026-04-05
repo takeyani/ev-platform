@@ -19,12 +19,67 @@ thead th { white-space: nowrap; }
 tbody tr:nth-child(even) { background-color: rgba(0, 0, 0, 0.015); }
 tbody tr:hover { background-color: rgba(16, 185, 129, 0.04) !important; }
 
-/* モバイルタップ領域 */
-@media (max-width: 768px) {
-  table td, table th { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+/* サイドバー（デスクトップ） */
+.sidebar {
+  width: 200px;
+  min-width: 200px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
 }
 
-/* サイドバーグラデーション */
-.sidebar-gradient {
-  background: linear-gradient(180deg, #064e3b 0%, #065f46 40%, #047857 100%);
+/* モバイルヘッダー（デスクトップでは非表示） */
+.mobile-header {
+  display: none;
+}
+
+/* オーバーレイ（デスクトップでは非表示） */
+.sidebar-overlay {
+  display: none;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  table td, table th { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: #064e3b;
+    padding: 8px 12px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 240px;
+    min-width: 240px;
+    height: 100vh;
+    z-index: 100;
+    transition: left 0.25s ease;
+  }
+
+  .sidebar-open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 90;
+  }
+
+  main {
+    padding-top: 52px !important;
+  }
 }

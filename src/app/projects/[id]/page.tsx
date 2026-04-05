@@ -7,7 +7,7 @@ import type { Project } from "@/lib/constants";
 import { fetchProject, updateProject, deleteProject } from "@/lib/db";
 import { invalidateProjectsCache } from "@/lib/useProjects";
 import { suggestNextStatus } from "@/lib/automation";
-import { getUserProfile, canDelete, type UserProfile } from "@/lib/auth";
+import { getUserProfile, canEdit, canDelete, canUploadFiles, type UserProfile } from "@/lib/auth";
 import { cell, hcell, section, shead, table, pageTitle, statusBadge, badge } from "@/lib/styles";
 import FileUploader from "@/components/FileUploader";
 
@@ -42,7 +42,7 @@ export default function ProjectDetailPage() {
     try {
       await updateProject(p.id, { status: newStatus });
       invalidateProjectsCache();
-      setP({ ...p, status: newStatus as any });
+      setP({ ...p, status: newStatus as Project["status"] });
       setMsg(`✅ ${newStatus} に更新しました`);
       setTimeout(() => setMsg(""), 3000);
     } catch (e: any) { setMsg(`❌ ${e.message}`); }
@@ -73,6 +73,8 @@ export default function ProjectDetailPage() {
   if (loading) return <div style={pageTitle}>読み込み中...</div>;
   if (!p) return <div style={{ textAlign: "center", padding: 40 }}><div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>案件が見つかりません</div><Link href="/projects" style={{ color: "#059669" }}>← 案件一覧に戻る</Link></div>;
 
+  const editable = !profile || canEdit(profile.role);
+  const uploadable = !profile || canUploadFiles(profile.role);
   const statusToStep: Record<string, number> = { "交付決定待ち": 0, "交付決定済み": 1, "施工発注済み": 3, "日程調整中": 4, "着工前会議完了": 5, "安全書類提出済み": 6, "着工Ready": 8, "施工中": 9, "完了報告待ち": 10, "報告書確認中": 10, "検収完了": 11, "請求済み": 11 };
   const currentStep = statusToStep[p.status] ?? 0;
   const nextStatus = suggestNextStatus(p);
@@ -80,14 +82,14 @@ export default function ProjectDetailPage() {
   const fieldStyle: React.CSSProperties = { border: "1px solid #e5e7eb", borderRadius: 3, padding: "1px 4px", fontSize: 11, width: "100%" };
   const dateField = (label: string, value: string, dbField: string) => (
     <tr key={label}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{label}</td><td style={cell}>
-      <input type="date" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)}
-        style={{ ...fieldStyle, color: value ? "#1f2937" : "#f87171" }} />
+      {editable ? <input type="date" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)}
+        style={{ ...fieldStyle, color: value ? "#1f2937" : "#f87171" }} /> : <span style={{ fontSize: 11 }}>{value || "-"}</span>}
     </td></tr>
   );
   const textField = (label: string, value: string, dbField: string, placeholder?: string) => (
     <tr key={label}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{label}</td><td style={cell}>
-      <input type="text" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)} placeholder={placeholder}
-        style={{ ...fieldStyle, color: value ? "#1f2937" : "#9ca3af" }} />
+      {editable ? <input type="text" defaultValue={value || ""} onBlur={(e) => saveField(dbField, e.target.value)} placeholder={placeholder}
+        style={{ ...fieldStyle, color: value ? "#1f2937" : "#9ca3af" }} /> : <span style={{ fontSize: 11 }}>{value || "-"}</span>}
     </td></tr>
   );
 
@@ -110,19 +112,21 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* ステータス変更バー */}
-      <div style={{ ...section, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <div style={{ padding: "6px 10px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "#1e40af" }}>ステータス変更:</span>
-          {nextStatus && <button onClick={() => changeStatus(nextStatus)} disabled={saving} style={btn("#059669")}>→ {nextStatus}（推奨）</button>}
-          <select onChange={(e) => { if (e.target.value) changeStatus(e.target.value); e.target.value = ""; }} style={{ fontSize: 11, border: "1px solid #bfdbfe", borderRadius: 4, padding: "3px 6px" }}>
-            <option value="">手動選択...</option>
-            {PROJECT_STATUSES.filter(s => s !== p.status).map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          {(!profile || canDelete(profile.role)) && (
-            <button onClick={handleDelete} style={{ ...btn("#dc2626"), marginLeft: "auto" }}>🗑 案件削除</button>
-          )}
+      {editable && (
+        <div style={{ ...section, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <div style={{ padding: "6px 10px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#1e40af" }}>ステータス変更:</span>
+            {nextStatus && <button onClick={() => changeStatus(nextStatus)} disabled={saving} style={btn("#059669")}>→ {nextStatus}（推奨）</button>}
+            <select onChange={(e) => { if (e.target.value) changeStatus(e.target.value); e.target.value = ""; }} style={{ fontSize: 11, border: "1px solid #bfdbfe", borderRadius: 4, padding: "3px 6px" }}>
+              <option value="">手動選択...</option>
+              {PROJECT_STATUSES.filter(s => s !== p.status).map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            {(!profile || canDelete(profile.role)) && (
+              <button onClick={handleDelete} style={{ ...btn("#dc2626"), marginLeft: "auto" }}>🗑 案件削除</button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* フロー進捗 */}
       <div style={section}><table style={table}><tbody><tr>
@@ -168,11 +172,13 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* ファイルアップロード 3列 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
-        <FileUploader bucket="drawings" folder={p.caseId} label="📐 図面ファイル" accept=".pdf,.png,.jpg,.dwg,.dxf" />
-        <FileUploader bucket="documents" folder={p.caseId} label="📄 安全書類" accept=".pdf,.xlsx,.xls,.doc,.docx" />
-        <FileUploader bucket="photos" folder={p.caseId} label="📷 工事写真" accept=".jpg,.jpeg,.png,.heic" />
-      </div>
+      {uploadable && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
+          <FileUploader bucket="drawings" folder={p.caseId} label="📐 図面ファイル" accept=".pdf,.png,.jpg,.dwg,.dxf" />
+          <FileUploader bucket="documents" folder={p.caseId} label="📄 安全書類" accept=".pdf,.xlsx,.xls,.doc,.docx" />
+          <FileUploader bucket="photos" folder={p.caseId} label="📷 工事写真" accept=".jpg,.jpeg,.png,.heic" />
+        </div>
+      )}
 
       {/* 安全書類チェック */}
       <div style={section}><div style={shead}>🦺 安全書類チェック（{SAFETY_DOCUMENTS.length}種類）— <Link href="/safety" style={{ color: "#059669", textDecoration: "none", fontSize: 10 }}>安全書類管理ページへ →</Link></div><table style={table}><thead><tr><th style={hcell}>ID</th><th style={hcell}>書類名</th><th style={hcell}>頻度</th><th style={hcell}>要否</th></tr></thead><tbody>{SAFETY_DOCUMENTS.map((d) => <tr key={d.id}><td style={{ ...cell, fontFamily: "monospace", color: "#9ca3af" }}>{d.id}</td><td style={cell}>{d.name}</td><td style={{ ...cell, color: "#9ca3af", fontSize: 10 }}>{d.frequency}</td><td style={cell}><span style={badge(d.required === "必須" ? "#fee2e2" : "#f3f4f6", d.required === "必須" ? "#b91c1c" : "#6b7280")}>{d.required}</span></td></tr>)}</tbody></table></div>
