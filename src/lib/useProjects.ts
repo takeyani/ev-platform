@@ -30,7 +30,7 @@ export function useProjects() {
         setProjects(data);
         setDbMode(true);
       })
-      .catch(() => {})
+      .catch((err) => { console.error("Failed to fetch projects:", err); })
       .finally(() => setLoading(false));
   }, []);
 

@@ -140,7 +140,10 @@ export default function ProjectDetailPage() {
         </tbody></table></div>
 
         <div style={section}><div style={shead}>📦 資材・完了報告</div><table style={table}><tbody>
+          {dateField("充電器配送依頼", p.chargerDeliveryRequestDate, "charger_delivery_request_date")}
+          {dateField("看板配送依頼", p.signboardDeliveryRequestDate, "signboard_delivery_request_date")}
           {dateField("充電器納品確認", p.chargerDeliveryConfirmDate, "charger_delivery_confirm_date")}
+          {dateField("看板納品確認", p.signboardDeliveryConfirmDate, "signboard_delivery_confirm_date")}
           {dateField("電材確保確認", p.materialConfirmDate, "material_confirm_date")}
           {dateField("実着工日", p.actualStartDate, "actual_start_date")}
           {dateField("実完工日", p.actualEndDate, "actual_end_date")}
