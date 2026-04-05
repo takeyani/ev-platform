@@ -342,6 +342,9 @@ CREATE POLICY "contractor_own" ON projects
 - [x] ロール別UI制御（削除ボタンはadminのみ等）
 - [x] 案件詳細に図面・書類・写真アップロード統合
 - [x] 案件削除（確認ダイアログ付き）
+- [x] 案件新規作成フォームに型番・Seko担当フィールド追加
+- [x] 案件詳細に配送依頼日（充電器・看板）・看板納品確認日の編集UI追加
+- [x] useProjectsエラーログ出力追加
 
 ### Phase 3: 次期対応
 - [ ] Kizuku API連携（トーク・報告書・写真）
