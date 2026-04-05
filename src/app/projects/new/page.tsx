@@ -35,7 +35,9 @@ export default function NewProjectPage() {
         constructionArea: fd.get("area"),
         chargerCategory: fd.get("chargerCat"),
         chargerManufacturer: fd.get("mfr"),
+        chargerModel: fd.get("chargerModel"),
         quantity: fd.get("qty"),
+        sekoManager: fd.get("sekoMgr"),
         salesDepartment: fd.get("salesDept"),
         caseManager: fd.get("caseMgr"),
         constructionManager: fd.get("constMgr"),
@@ -79,8 +81,10 @@ export default function NewProjectPage() {
             <tbody>
               <tr><td style={labelStyle}>充電器種別 *</td><td style={inputCell}><select name="chargerCat" required style={select}><option value="">選択</option>{CHARGER_CATEGORIES.map((c) => <option key={c.value} value={c.label}>{c.label}</option>)}</select></td>
                   <td style={labelStyle}>メーカー</td><td style={inputCell}><select name="mfr" style={select}><option value="">選択</option>{CHARGER_MANUFACTURERS.map((m) => <option key={m.value} value={m.label}>{m.label}</option>)}</select></td></tr>
-              <tr><td style={labelStyle}>設置台数 *</td><td style={inputCell}><input name="qty" type="number" min={1} defaultValue={1} style={{ ...input, width: 80 }} /></td>
-                  <td style={labelStyle}>施工エリア</td><td style={inputCell}><select name="area" style={select}><option value="">選択</option>{CONSTRUCTION_AREAS.map((a) => <option key={a}>{a}</option>)}</select></td></tr>
+              <tr><td style={labelStyle}>型番</td><td style={inputCell}><input name="chargerModel" style={input} placeholder="EVPT-2G60J-F-L5" /></td>
+                  <td style={labelStyle}>設置台数 *</td><td style={inputCell}><input name="qty" type="number" min={1} defaultValue={1} style={{ ...input, width: 80 }} /></td></tr>
+              <tr><td style={labelStyle}>施工エリア</td><td style={inputCell}><select name="area" style={select}><option value="">選択</option>{CONSTRUCTION_AREAS.map((a) => <option key={a}>{a}</option>)}</select></td>
+                  <td style={labelStyle}>Seko担当</td><td style={inputCell}><input name="sekoMgr" style={input} /></td></tr>
             </tbody>
           </table>
         </div>

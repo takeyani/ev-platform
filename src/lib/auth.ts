@@ -31,6 +31,7 @@ export function canDelete(role: UserRole): boolean {
   return role === "admin";
 }
 
+/** ユーザー管理画面（将来実装予定） */
 export function canManageUsers(role: UserRole): boolean {
   return role === "admin";
 }
