@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getUser, signOut } from "@/lib/auth";
 import "./globals.css";
 
 const navItems = [
@@ -21,7 +22,10 @@ const navItems = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+
+  useEffect(() => { getUser().then(setUser).catch(() => {}); }, []);
 
   return (
     <html lang="ja">
@@ -59,8 +63,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 );
               })}
             </nav>
-            <div style={{ padding: "8px 14px", borderTop: "1px solid rgba(255,255,255,0.1)", fontSize: 9, color: "rgba(167,243,208,0.35)", textAlign: "center" }}>
-              Terra Charge
+            <div style={{ padding: "8px 10px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+              {user ? (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 9, color: "rgba(167,243,208,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 120 }}>{user.email}</span>
+                  <button onClick={async () => { await signOut(); setUser(null); }} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "rgba(167,243,208,0.6)", fontSize: 9, borderRadius: 3, padding: "2px 6px", cursor: "pointer" }}>ログアウト</button>
+                </div>
+              ) : (
+                <Link href="/login" style={{ display: "block", textAlign: "center", fontSize: 10, color: "rgba(167,243,208,0.5)", textDecoration: "none" }}>ログイン</Link>
+              )}
             </div>
           </aside>
 
