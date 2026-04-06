@@ -1,5 +1,15 @@
 # EV充電器施工管理プラットフォーム - システム設計書
 
+## 0. デプロイ情報
+
+| 項目 | 値 |
+|------|-----|
+| 公開URL | https://ev-charger-mgmt.vercel.app |
+| GitHubリポジトリ | https://github.com/takeyani/ev-platform |
+| Vercelプロジェクト | v01d-1/ev-platform |
+| デプロイ方式 | GitHub連携による自動デプロイ（master branch push） |
+| ローカル開発 | `npm run dev`（ポート3010） |
+
 ## 1. 技術スタック
 
 | レイヤー | 技術 | 備考 |
