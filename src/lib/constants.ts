@@ -61,6 +61,10 @@ export const SUBSIDY_TYPES = [
 
 export type SubsidyType = (typeof SUBSIDY_TYPES)[number];
 
+export type ReadyStatus = "Ready" | "Not Ready" | "";
+export type WasteDisposal = "有" | "無" | "";
+export type ReportStatus = "未作成" | "提出済み" | "差戻" | "承認済み" | "";
+
 // --- 申請区分 ---
 export const APPLICATION_CATEGORIES = [
   "目的地充電",

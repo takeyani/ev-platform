@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import type { ProjectStatus, SubsidyType, ReadyStatus, WasteDisposal, ReportStatus } from "./constants";
 
 export type ProjectRow = {
   id: string; case_id: string; nev_id: string; subsidy_type: string; name: string;
@@ -25,7 +26,7 @@ function toSnake(s: string): string {
 
 export function toProject(r: ProjectRow) {
   return {
-    id: r.id, caseId: r.case_id, nevId: r.nev_id, subsidyType: r.subsidy_type as any,
+    id: r.id, caseId: r.case_id, nevId: r.nev_id, subsidyType: r.subsidy_type as SubsidyType,
     name: r.name, location: r.location, prefecture: r.prefecture,
     applicationCategory: r.application_category, constructionArea: r.construction_area,
     chargerCategory: r.charger_category, chargerManufacturer: r.charger_manufacturer,
@@ -44,19 +45,19 @@ export function toProject(r: ProjectRow) {
     startDate: r.start_date || "", endDate: r.end_date || "",
     powerReceptionDate: r.power_reception_date || "",
     blackoutDate: r.blackout_date || "", blackoutTime: r.blackout_time,
-    readyStatus: (r.ready_status || "") as any,
+    readyStatus: (r.ready_status || "") as ReadyStatus,
     readyConfirmDate: r.ready_confirm_date || "",
     siteManagerName: r.site_manager_name, siteManagerPhone: r.site_manager_phone,
-    wasteDisposal: (r.waste_disposal || "") as any,
+    wasteDisposal: (r.waste_disposal || "") as WasteDisposal,
     wasteDescription: r.waste_description,
     wastePickupDate: r.waste_pickup_date || "",
     wastePickupTime: r.waste_pickup_time,
     actualStartDate: r.actual_start_date || "",
     actualEndDate: r.actual_end_date || "",
     completionReportDate: r.completion_report_date || "",
-    reportStatus: (r.report_status || "") as any,
+    reportStatus: (r.report_status || "") as ReportStatus,
     reportApprovalDate: r.report_approval_date || "",
-    status: r.status as any, subsidy: r.subsidy, notes: r.notes,
+    status: r.status as ProjectStatus, subsidy: r.subsidy, notes: r.notes,
     updatedAt: r.updated_at?.slice(0, 10) || "",
   };
 }

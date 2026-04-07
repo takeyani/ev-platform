@@ -20,7 +20,7 @@
 | 認証 | Supabase Auth | RLS対応 |
 | DB | Supabase (PostgreSQL) | Row Level Security |
 | ファイルストレージ | Supabase Storage | 図面・写真・PDF |
-| 3D描画 | Three.js | 断面図ビューア |
+| 断面図描画 | Canvas API | CrossSectionViewer |
 | デプロイ | Vercel | Edge Functions |
 | ポート | 3010 | 開発サーバー |
 
@@ -375,6 +375,9 @@ CREATE POLICY "contractor_own" ON projects
 - [x] 施工関連規則をconstantsに抽出（documents/page.tsxハードコード解消）
 - [x] 図面ページのdynamic importにloading状態追加
 - [x] 新規案件フォームに台数バリデーション追加
+- [x] 未使用依存パッケージ削除（three, @types/three）
+- [x] db.ts の `as any` キャストを正しい型に置換（ProjectStatus/SubsidyType等）
+- [x] supabase.ts 環境変数バリデーション追加（non-null assertion解消）
 
 ### Phase 3: 次期対応
 - [x] 検索機能（案件一覧テキスト検索 — Phase 2.5で実装済み）
