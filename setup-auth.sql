@@ -63,7 +63,6 @@ CREATE POLICY "terra_all_projects" ON projects FOR ALL
 CREATE POLICY "contractor_own_projects" ON projects FOR SELECT
   USING (
     contractor = (SELECT company FROM user_profiles WHERE id = auth.uid())
-    OR NOT EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid())
   );
 
 -- 協力会社は担当案件のステータス更新・書類提出のみ
@@ -78,9 +77,5 @@ CREATE POLICY "manufacturer_read_projects" ON projects FOR SELECT
     charger_manufacturer = (SELECT company FROM user_profiles WHERE id = auth.uid())
   );
 
--- 未認証ユーザーも閲覧可（デモ用）
-CREATE POLICY "anon_read_projects" ON projects FOR SELECT
-  USING (auth.uid() IS NULL);
-CREATE POLICY "anon_write_projects" ON projects FOR ALL
-  USING (auth.uid() IS NULL)
-  WITH CHECK (auth.uid() IS NULL);
+-- 注意: 匿名アクセスポリシーは setup-security-fix.sql で削除済み
+-- セキュリティ上、未認証アクセスは許可しない

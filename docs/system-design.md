@@ -389,6 +389,23 @@ CREATE POLICY "contractor_own" ON projects
 - [x] db.ts の `as any` キャストを正しい型に置換（ProjectStatus/SubsidyType等）
 - [x] supabase.ts 環境変数バリデーション追加（non-null assertion解消）
 
+### Phase 2.6: セキュリティ強化 ✅ 完了
+- [x] **Critical** ストレージバケットを非公開化（drawings/documents/photos）
+- [x] **Critical** projectsテーブルの匿名アクセスポリシー削除（anon_read/write）
+- [x] **Critical** db.tsにバックエンド権限チェック追加（updateProject/deleteProject/createProject）
+- [x] **Critical** auth.tsの contractor フォールバック削除（profile取得失敗時はnull）
+- [x] **High** ファイルアップロードバリデーション（10MB上限・MIMEホワイトリスト・パストラバーサル防止）
+- [x] **High** 案件詳細のSAMPLE_PROJECTSフォールバック削除（エラー表示に変更）
+- [x] **High** terra_constロールを読み取り専用化（admin/terra_caseのみ書き込み）
+- [x] **High** エラーメッセージのサニタイズ（DBエラー詳細を非露出、console.errorでログ）
+- [x] **High** signed URL対応（プライベートバケットからのファイル取得用）
+- [x] **Medium** セキュリティヘッダー追加（X-Frame-Options/CSP/HSTS等）
+
+### Phase 2.6 デプロイ手順
+1. **Supabase SQL Editor** で `setup-security-fix.sql` を実行（RLSポリシー反映に必須）
+2. `git push origin master` → Vercel自動デプロイ
+3. ログアウト状態で /projects にアクセスできないことを確認
+
 ### Phase 3: 次期対応
 - [x] 検索機能（案件一覧テキスト検索 — Phase 2.5で実装済み）
 - [ ] ページネーション（大量案件対応）

@@ -1,19 +1,17 @@
--- Supabase Storage バケット作成
+-- Supabase Storage バケット作成（セキュア版）
 -- Supabase SQL Editor で実行してください
 
--- 図面バケット
-INSERT INTO storage.buckets (id, name, public) VALUES ('drawings', 'drawings', true)
-ON CONFLICT (id) DO NOTHING;
+-- 図面バケット（非公開）
+INSERT INTO storage.buckets (id, name, public) VALUES ('drawings', 'drawings', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
 
--- 安全書類バケット
-INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', true)
-ON CONFLICT (id) DO NOTHING;
+-- 安全書類バケット（非公開）
+INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
 
--- 写真バケット
-INSERT INTO storage.buckets (id, name, public) VALUES ('photos', 'photos', true)
-ON CONFLICT (id) DO NOTHING;
+-- 写真バケット（非公開）
+INSERT INTO storage.buckets (id, name, public) VALUES ('photos', 'photos', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
 
--- 全バケットのアクセスポリシー（認証なしで読み書き可）
-CREATE POLICY "allow_all_drawings" ON storage.objects FOR ALL USING (bucket_id = 'drawings') WITH CHECK (bucket_id = 'drawings');
-CREATE POLICY "allow_all_documents" ON storage.objects FOR ALL USING (bucket_id = 'documents') WITH CHECK (bucket_id = 'documents');
-CREATE POLICY "allow_all_photos" ON storage.objects FOR ALL USING (bucket_id = 'photos') WITH CHECK (bucket_id = 'photos');
+-- 注意: アクセスポリシーは setup-security-fix.sql で定義
+-- 認証ユーザーのみ読み書き可、削除は admin/terra_case のみ

@@ -1,5 +1,20 @@
 import { supabase } from "./supabase";
 import type { ProjectStatus, SubsidyType, ReadyStatus, WasteDisposal, ReportStatus } from "./constants";
+import { getUserProfile } from "./auth";
+
+/** 案件への書き込み権限チェック（contractorは自社案件のみ） */
+async function assertWriteAccess(projectId: string) {
+  const profile = await getUserProfile();
+  if (!profile) throw new Error("認証が必要です");
+  if (["admin", "terra_case"].includes(profile.role)) return;
+  if (profile.role === "contractor") {
+    const { data, error } = await supabase.from("projects").select("contractor").eq("id", projectId).single();
+    if (error || !data) throw new Error("案件が見つかりません");
+    if (data.contractor !== profile.company) throw new Error("この案件を編集する権限がありません");
+    return;
+  }
+  throw new Error("編集権限がありません");
+}
 
 export type ProjectRow = {
   id: string; case_id: string; nev_id: string; subsidy_type: string; name: string;
@@ -108,16 +123,21 @@ export async function createProject(fields: Record<string, any>) {
     actual_start_date: null, actual_end_date: null,
     completion_report_date: null, report_status: "", report_approval_date: null,
   };
+  const profile = await getUserProfile();
+  if (!profile) throw new Error("認証が必要です");
+  if (!["admin", "terra_case"].includes(profile.role)) throw new Error("案件作成権限がありません");
   const { data, error } = await supabase.from("projects").insert(row).select().single();
   if (error) {
     if (error.code === "23505") throw new Error("この案件IDは既に使用されています");
-    throw new Error(`保存に失敗しました: ${error.message}`);
+    console.error("[createProject]", error);
+    throw new Error("保存に失敗しました");
   }
   return toProject(data as ProjectRow);
 }
 
 /** camelCase/snake_case両対応でDBに保存 */
 export async function updateProject(id: string, fields: Record<string, any>) {
+  await assertWriteAccess(id);
   const dbFields: Record<string, any> = {};
   for (const [key, value] of Object.entries(fields)) {
     const snakeKey = key.includes("_") ? key : toSnake(key);
@@ -125,10 +145,18 @@ export async function updateProject(id: string, fields: Record<string, any>) {
   }
   dbFields.updated_at = new Date().toISOString();
   const { error } = await supabase.from("projects").update(dbFields).eq("id", id);
-  if (error) throw new Error(`更新に失敗しました: ${error.message}`);
+  if (error) {
+    console.error("[updateProject]", error);
+    throw new Error("更新に失敗しました");
+  }
 }
 
 export async function deleteProject(id: string) {
+  const profile = await getUserProfile();
+  if (!profile || profile.role !== "admin") throw new Error("削除権限がありません");
   const { error } = await supabase.from("projects").delete().eq("id", id);
-  if (error) throw new Error(`削除に失敗しました: ${error.message}`);
+  if (error) {
+    console.error("[deleteProject]", error);
+    throw new Error("削除に失敗しました");
+  }
 }

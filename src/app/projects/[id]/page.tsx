@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, SAMPLE_PROJECTS, PROJECT_STATUSES } from "@/lib/constants";
+import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, PROJECT_STATUSES } from "@/lib/constants";
 import type { Project } from "@/lib/constants";
 import { fetchProject, updateProject, deleteProject } from "@/lib/db";
 import { invalidateProjectsCache } from "@/lib/useProjects";
@@ -30,7 +30,7 @@ export default function ProjectDetailPage() {
     setLoading(true);
     fetchProject(id)
       .then(setP)
-      .catch(() => { const fb = SAMPLE_PROJECTS.find((x) => x.id === id); if (fb) setP(fb); })
+      .catch((err) => { setMsg(`❌ 案件の読み込みに失敗しました: ${err.message || ""}`); setP(null); })
       .finally(() => setLoading(false));
   }
   useEffect(load, [id]);

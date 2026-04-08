@@ -80,8 +80,9 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     .single();
 
   if (error || !data) {
-    // user_profilesテーブルが無い場合のフォールバック
-    return { id: user.id, email: user.email || "", displayName: "", role: "contractor", company: "", phone: "" };
+    // セキュリティ: profileが取得できない場合はnullを返す
+    // contractorロールへのフォールバックは権限昇格脆弱性となるため削除
+    return null;
   }
 
   return {
