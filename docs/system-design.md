@@ -10,6 +10,16 @@
 | デプロイ方式 | GitHub連携による自動デプロイ（master branch push） |
 | ローカル開発 | `npm run dev`（ポート3010） |
 
+### 運用ノート
+- 通常: `git push origin master` でVercelが自動的にビルド・デプロイ
+- 自動デプロイが反応しない場合（Webhookトラブル等）の手動リカバリ:
+  ```bash
+  cd ev-platform
+  npx vercel --prod                                          # 手動デプロイ
+  npx vercel alias set <new-deployment-url> ev-charger-mgmt.vercel.app  # エイリアス更新
+  ```
+- 最新デプロイ確認: `npx vercel ls ev-platform`
+
 ## 1. 技術スタック
 
 | レイヤー | 技術 | 備考 |
