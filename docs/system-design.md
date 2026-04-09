@@ -403,8 +403,16 @@ CREATE POLICY "contractor_own" ON projects
 
 ### Phase 2.6 デプロイ手順
 1. **Supabase SQL Editor** で `setup-security-fix.sql` を実行（RLSポリシー反映に必須）
-2. `git push origin master` → Vercel自動デプロイ
-3. ログアウト状態で /projects にアクセスできないことを確認
+2. 既存の `allow_all` ポリシーが残っている場合は `DROP POLICY IF EXISTS "allow_all" ON projects;` を実行
+3. `git push origin master` → Vercel自動デプロイ
+4. ログアウト状態で /projects にアクセスできないことを確認
+
+### Phase 2.6 動作確認結果（2026-04-09）
+- ✅ 全13ページ HTTP 200
+- ✅ 自動化ロジックテスト: 全項目PASS（checkReadyStatus / getMaterialStatus / getSafetyDocStatus / getDeadlineAlerts / suggestNextStatus / getDashboardSummary / getMonthlyInspectionSummary）
+- ✅ セキュリティヘッダー配信確認: X-Frame-Options/X-Content-Type-Options/Referrer-Policy/HSTS/Permissions-Policy
+- ✅ 匿名アクセス遮断: anon key で `/rest/v1/projects` 取得 → `[]`（空配列）
+- ✅ ストレージ非公開化: public URL 経由で HTTP 400
 
 ### Phase 3: 次期対応
 - [x] 検索機能（案件一覧テキスト検索 — Phase 2.5で実装済み）
