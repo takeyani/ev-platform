@@ -407,6 +407,19 @@ CREATE POLICY "contractor_own" ON projects
 3. `git push origin master` → Vercel自動デプロイ
 4. ログアウト状態で /projects にアクセスできないことを確認
 
+### Phase 2.7: 新規登録フォーム フルセット化 ✅ 完了
+- [x] 新規案件登録フォームを18フィールド→35フィールドに拡張
+- [x] 「最低限のみ / フル入力」モード切替ボタン追加
+- [x] 日程管理セクション追加（発注/会議/配送/着工/完工/受電/停電）
+- [x] 現場担当セクション追加（氏名/電話）
+- [x] 産廃セクション追加（有無/荷姿/回収日時）
+- [x] 補助金セクション追加
+- [x] バリデーション強化:
+  - 着工予定日 ≦ 完工予定日チェック
+  - 産廃「有」時のwasteDescription必須チェック
+  - 電話番号フォーマット（10〜11桁）チェック
+- [x] db.ts createProject() を全フィールド対応に拡張
+
 ### Phase 2.6 動作確認結果（2026-04-09）
 - ✅ 全13ページ HTTP 200
 - ✅ 自動化ロジックテスト: 全項目PASS（checkReadyStatus / getMaterialStatus / getSafetyDocStatus / getDeadlineAlerts / suggestNextStatus / getDashboardSummary / getMonthlyInspectionSummary）

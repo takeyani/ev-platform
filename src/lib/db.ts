@@ -90,6 +90,7 @@ export async function fetchProject(id: string) {
 }
 
 export async function createProject(fields: Record<string, any>) {
+  const dateOrNull = (v: any) => (v ? v : null);
   const row: Record<string, any> = {
     case_id: fields.caseId || fields.case_id || "",
     nev_id: fields.nevId || "",
@@ -110,16 +111,33 @@ export async function createProject(fields: Record<string, any>) {
     contractor: fields.contractor || "",
     status: "交付決定待ち",
     notes: fields.notes || "",
-    subsidy: "",
-    order_date: null, pre_construction_meeting_date: null, pre_construction_meeting_time: "",
-    safety_doc_submit_date: null, charger_delivery_request_date: null,
-    signboard_delivery_request_date: null, charger_delivery_confirm_date: null,
-    signboard_delivery_confirm_date: null, material_confirm_date: null,
-    start_date: null, end_date: null, power_reception_date: null,
-    blackout_date: null, blackout_time: "",
-    ready_status: "", ready_confirm_date: null,
-    site_manager_name: "", site_manager_phone: "",
-    waste_disposal: "", waste_description: "", waste_pickup_date: null, waste_pickup_time: "",
+    subsidy: fields.subsidy || "",
+    // 日程系（任意）
+    order_date: dateOrNull(fields.orderDate),
+    pre_construction_meeting_date: dateOrNull(fields.preConstructionMeetingDate),
+    pre_construction_meeting_time: fields.preConstructionMeetingTime || "",
+    safety_doc_submit_date: dateOrNull(fields.safetyDocSubmitDate),
+    charger_delivery_request_date: dateOrNull(fields.chargerDeliveryRequestDate),
+    signboard_delivery_request_date: dateOrNull(fields.signboardDeliveryRequestDate),
+    charger_delivery_confirm_date: null,
+    signboard_delivery_confirm_date: null,
+    material_confirm_date: null,
+    start_date: dateOrNull(fields.startDate),
+    end_date: dateOrNull(fields.endDate),
+    power_reception_date: dateOrNull(fields.powerReceptionDate),
+    blackout_date: dateOrNull(fields.blackoutDate),
+    blackout_time: fields.blackoutTime || "",
+    ready_status: "",
+    ready_confirm_date: null,
+    // 現場担当（任意）
+    site_manager_name: fields.siteManagerName || "",
+    site_manager_phone: fields.siteManagerPhone || "",
+    // 産廃（任意）
+    waste_disposal: fields.wasteDisposal || "",
+    waste_description: fields.wasteDescription || "",
+    waste_pickup_date: dateOrNull(fields.wastePickupDate),
+    waste_pickup_time: fields.wastePickupTime || "",
+    // 完了報告（登録時は未入力）
     actual_start_date: null, actual_end_date: null,
     completion_report_date: null, report_status: "", report_approval_date: null,
   };
