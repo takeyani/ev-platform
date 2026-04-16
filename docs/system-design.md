@@ -25,7 +25,7 @@
 | レイヤー | 技術 | 備考 |
 |---------|------|------|
 | フロントエンド | Next.js 16 + React 19 | App Router, Server Components |
-| スタイリング | Tailwind CSS 4 | ユーティリティファースト |
+| スタイリング | インラインCSS + Tailwind CSS 4 (preflight) | CSSProperties直接指定 |
 | 型システム | TypeScript 6 | 厳密モード |
 | 認証 | Supabase Auth | RLS対応 |
 | DB | Supabase (PostgreSQL) | Row Level Security |
@@ -209,47 +209,68 @@ CREATE TABLE charger_devices (
 
 ## 3. アプリケーション構成
 
-### 3.1 ページ構成（実装済み 13ページ）
+### 3.1 ページ構成（実装済み 14ページ）
 
 ```
-/ (ダッシュボード)         ← 自動集計・アラート・Ready/資材判定
+/ (ダッシュボード)         ← KPI自動集計・アラート・Ready/資材判定・テラ担当者・社内体制
 ├── /flow (業務フロー)     ← 11ステップ詳細・期限ルール・チェックリスト
-├── /projects (案件管理)
-│   ├── /projects/new (新規登録) ← マスタ連携フォーム
-│   └── /projects/[id] (案件詳細) ← フロー進捗・日程・資材・安全書類
-├── /site-surveys (現場調査)     ← Toyokumo連携・撮影ポイント・案件別状況
-├── /drawings (図面管理)         ← 4種図面 + 3コンポーネント(Canvas描画)
+├── /projects (案件管理)   ← テキスト検索・ステータスフィルタ
+│   ├── /projects/new (新規登録) ← フルセット35フィールド・最低限/フルモード切替
+│   └── /projects/[id] (案件詳細) ← フロー進捗・全日程編集・資材・安全書類・種別条件表示
+├── /site-surveys (現場調査)     ← 新規調査依頼フロー・撮影ポイント・案件別状況
+├── /drawings (図面管理)         ← 4種図面 + 3コンポーネント(Canvas描画・動的import)
 ├── /construction (施工管理)     ← 施工中/Ready/準備中 + Ready自動判定
-├── /equipment (充電器管理)      ← 7メーカー・マスタ集計・キュービクル
-├── /documents (書類管理)        ← 14種安全書類 + 図面種別 + 仕様書
-├── /schedule (スケジュール)     ← ガントチャート + 日程詳細
+├── /equipment (充電器管理)      ← 案件種別×充電器条件・7メーカー・キュービクル
+├── /documents (書類管理)        ← 14種安全書類 + 図面種別 + 施工規則(CONSTRUCTION_REGULATIONS)
+├── /schedule (スケジュール)     ← 日程詳細 + 期限色分け(超過赤/7日以内黄)
 ├── /safety (安全管理)           ← 14種書類 + 案件別提出状況
-└── /reports (完了報告)          ← 月次検収自動集計 + 報告フロー
+├── /reports (完了報告)          ← 月次検収自動集計（動的日付）+ 報告フロー
+└── /login (ログイン)            ← Supabase Auth + 5ロール説明・a11y対応
 ```
 
-### 3.2 コンポーネント構成（実装済み 3コンポーネント）
+### 3.2 コンポーネント構成（実装済み 4コンポーネント）
 
 ```
 src/components/
-├── AutoDrawingGenerator.tsx   # Canvas自動図面生成（4充電器種・3レイアウト）
-├── CrossSectionViewer.tsx     # Canvas断面図ビューア（3kW/6kW/急速 4種）
-└── DrawingEditor.tsx          # Canvasドラッグ＆ドロップ図面エディタ（11要素）
+├── FileUploader.tsx            # ファイルアップロード・一覧・DL・削除（10MB上限・MIME検証・signed URL）
+├── AutoDrawingGenerator.tsx    # Canvas自動図面生成（4充電器種・3レイアウト）
+├── CrossSectionViewer.tsx      # Canvas断面図ビューア（3kW/6kW/急速 4種）
+└── DrawingEditor.tsx           # Canvasドラッグ＆ドロップ図面エディタ（11要素）
 ```
 
-### 3.3 自動化ロジック（実装済み `src/lib/automation.ts`）
+### 3.3 ライブラリ構成（`src/lib/`）
 
 ```
 src/lib/
-├── constants.ts    # マスタデータ（ステータス14種・安全書類14種・充電器7メーカー20+モデル・Project型60+フィールド）
-└── automation.ts   # 自動化ロジック
-    ├── checkReadyStatus()             # 着工Ready自動判定（9〜12条件）
-    ├── getDeadlineAlerts()            # 期限アラート自動生成
-    ├── getMaterialStatus()            # 資材確認状況チェック
-    ├── suggestNextStatus()            # ステータス自動遷移候補
-    ├── getMonthlyInspectionSummary()  # 月次検収自動集計
-    ├── getSafetyDocStatus()           # 安全書類提出状況
-    ├── getDashboardSummary()          # ダッシュボード全指標集計
-    └── addBusinessDays()              # 営業日計算
+├── constants.ts    # マスタデータ定義
+│   ├── PROJECT_STATUSES (14種) / STATUS_GROUPS / SUBSIDY_TYPES
+│   ├── APPLICATION_CATEGORIES (5種: 基礎/目的地/急速/超急速/経路)
+│   ├── CHARGER_CATEGORIES (7種) / CHARGER_MANUFACTURERS (7社)
+│   ├── SAFETY_DOCUMENTS (14種) / CONSTRUCTION_REGULATIONS (8種)
+│   ├── CONSTRUCTION_AREAS (3: 東/中/西日本) / CONSTRUCTION_FLOW_STEPS (11)
+│   ├── PROJECT_TYPE_DETAILS (案件種別4分類の条件詳細)
+│   ├── TERRA_MANAGERS (R8テラ担当者3名) / INTERNAL_STAFF (社内5名)
+│   ├── SITE_SURVEY_REQUEST_FLOW (新規調査依頼6ステップ)
+│   ├── PHOTO_CHECK_ITEMS / PRE_CONSTRUCTION_MEETING_ITEMS / INSPECTION_REQUIREMENTS
+│   ├── Project型 (60+フィールド) / ProjectStatus / SubsidyType / ReadyStatus / WasteDisposal / ReportStatus
+│   └── SAMPLE_PROJECTS (8件)
+│
+├── automation.ts   # 自動化ロジック
+│   ├── checkReadyStatus()             # 着工Ready自動判定（9〜12条件）
+│   ├── getDeadlineAlerts()            # 期限アラート自動生成
+│   ├── getMaterialStatus()            # 資材確認状況チェック
+│   ├── suggestNextStatus()            # ステータス自動遷移候補
+│   ├── getMonthlyInspectionSummary()  # 月次検収自動集計
+│   ├── getSafetyDocStatus()           # 安全書類提出状況
+│   ├── getDashboardSummary()          # ダッシュボード全指標集計
+│   └── addBusinessDays()              # 営業日計算
+│
+├── db.ts           # DB操作（Supabase CRUD + バックエンド権限チェック）
+├── auth.ts         # 認証・RBAC（5ロール: admin/terra_case/terra_const/contractor/manufacturer）
+├── storage.ts      # ファイルストレージ（バリデーション付きアップロード・signed URL）
+├── supabase.ts     # Supabaseクライアント初期化（環境変数バリデーション付き）
+├── useProjects.ts  # Reactフック（キャッシュ15秒・グローバル無効化・エラーログ）
+└── styles.ts       # 共有インラインスタイル（cell/hcell/section/statusBadge等）
 ```
 
 ---
@@ -317,20 +338,47 @@ Phase 4: Google Sheets は読み取り専用のバックアップに
 
 ## 6. セキュリティ設計
 
-### 6.1 RLS（Row Level Security）ポリシー
-```sql
--- テラ社員は全案件アクセス可
-CREATE POLICY "terra_staff_all" ON projects
-  FOR ALL TO authenticated
-  USING (auth.jwt() ->> 'org_role' = 'terra_staff');
+### 6.1 認証・認可
+- **認証**: Supabase Auth（メール+パスワード）
+- **5ロール**: admin, terra_case, terra_const, contractor, manufacturer
+- **フロントエンド**: canEdit/canDelete/canUploadFiles でUI制御
+- **バックエンド**: db.ts の assertWriteAccess() で権限チェック（contractor は自社案件のみ）
+- **DB層**: RLS ポリシーで最終防御
 
--- 協力会社は自社担当案件のみ
-CREATE POLICY "contractor_own" ON projects
-  FOR SELECT TO authenticated
-  USING (contractor_id = (
-    SELECT contractor_id FROM users WHERE id = auth.uid()
-  ));
+### 6.2 RLS（Row Level Security）ポリシー — `setup-security-fix.sql`
+```sql
+-- admin/terra_case: 全案件の全操作
+CREATE POLICY "admin_terra_case_all_projects" ON projects FOR ALL
+  USING (EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role IN ('admin', 'terra_case')));
+
+-- terra_const: 読み取り専用
+CREATE POLICY "terra_const_read_projects" ON projects FOR SELECT
+  USING (EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'terra_const'));
+
+-- contractor: 自社担当案件のみ閲覧・更新
+CREATE POLICY "contractor_own_projects" ON projects FOR SELECT
+  USING (contractor = (SELECT company FROM user_profiles WHERE id = auth.uid()));
+CREATE POLICY "contractor_update_projects" ON projects FOR UPDATE
+  USING (contractor = (SELECT company FROM user_profiles WHERE id = auth.uid()));
+
+-- manufacturer: 自社充電器の案件のみ閲覧
+CREATE POLICY "manufacturer_read_projects" ON projects FOR SELECT
+  USING (charger_manufacturer = (SELECT company FROM user_profiles WHERE id = auth.uid()));
 ```
+
+### 6.3 ストレージセキュリティ
+- 全バケット（drawings/documents/photos）を **非公開化**
+- 閲覧: 認証ユーザーのみ（signed URL経由）
+- アップロード: admin/terra_case/terra_const/contractor のみ
+- 削除: admin/terra_case のみ
+- ファイルバリデーション: 10MB上限、MIMEホワイトリスト、パストラバーサル防止
+
+### 6.4 セキュリティヘッダー — `next.config.ts`
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
 
 ---
 
