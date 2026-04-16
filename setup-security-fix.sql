@@ -75,6 +75,18 @@ CREATE POLICY "admin_delete_storage" ON storage.objects FOR DELETE
   );
 
 -- ============================================================
+-- 4. contractor_update_projects に WITH CHECK 追加
+-- ============================================================
+DROP POLICY IF EXISTS "contractor_update_projects" ON projects;
+CREATE POLICY "contractor_update_projects" ON projects FOR UPDATE
+  USING (
+    contractor = (SELECT company FROM user_profiles WHERE id = auth.uid())
+  )
+  WITH CHECK (
+    contractor = (SELECT company FROM user_profiles WHERE id = auth.uid())
+  );
+
+-- ============================================================
 -- 確認クエリ
 -- ============================================================
 -- SELECT policyname, cmd FROM pg_policies WHERE tablename = 'projects';

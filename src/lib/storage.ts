@@ -9,10 +9,12 @@ export type FileInfo = {
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_MIME: Record<string, string[]> = {
-  drawings: ["application/pdf", "image/png", "image/jpeg", "image/jpg", "application/octet-stream"],
-  documents: ["application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-  photos: ["image/jpeg", "image/jpg", "image/png", "image/heic", "image/heif"],
+
+/** 許可する拡張子（MIMEは偽装可能なので拡張子も検証） */
+const ALLOWED_EXTENSIONS: Record<string, string[]> = {
+  drawings: [".pdf", ".png", ".jpg", ".jpeg", ".dwg", ".dxf"],
+  documents: [".pdf", ".xlsx", ".xls", ".doc", ".docx"],
+  photos: [".jpg", ".jpeg", ".png", ".heic", ".heif"],
 };
 
 /** パストラバーサル防止のためファイルパスをサニタイズ */
@@ -20,14 +22,21 @@ function sanitizePath(path: string): string {
   return path.replace(/\.\./g, "").replace(/\\/g, "/").replace(/\/+/g, "/").replace(/^\/+/, "");
 }
 
+/** ファイル名をサニタイズ（危険な文字を除去） */
+function sanitizeFileName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._\u3000-\u9FFF\uF900-\uFAFF-]/g, "_");
+}
+
 /** ファイルアップロード（バリデーション付き） */
 export async function uploadFile(bucket: string, path: string, file: File): Promise<string> {
   if (file.size > MAX_FILE_SIZE) {
     throw new Error(`ファイルサイズが上限を超えています（最大10MB、現在 ${(file.size / 1024 / 1024).toFixed(1)}MB）`);
   }
-  const allowed = ALLOWED_MIME[bucket];
-  if (allowed && file.type && !allowed.includes(file.type)) {
-    throw new Error(`このバケットでは ${file.type} は許可されていません`);
+  // 拡張子チェック（MIMEは偽装可能なので拡張子を優先）
+  const ext = "." + file.name.split(".").pop()?.toLowerCase();
+  const allowed = ALLOWED_EXTENSIONS[bucket];
+  if (allowed && !allowed.includes(ext)) {
+    throw new Error(`このバケットでは ${ext} ファイルは許可されていません（許可: ${allowed.join(", ")}）`);
   }
   const safePath = sanitizePath(path);
   const { error } = await supabase.storage.from(bucket).upload(safePath, file, { upsert: true });
@@ -41,16 +50,16 @@ export function getFileUrl(bucket: string, path: string): string {
   return data.publicUrl;
 }
 
-/** 署名付きURL取得（プライベートバケット用、有効期限1時間） */
+/** 署名付きURL取得（プライベートバケット用、有効期限30分） */
 export async function getSignedUrl(bucket: string, path: string): Promise<string> {
-  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 1800);
   if (error) throw error;
   return data.signedUrl;
 }
 
 /** ファイル一覧取得（署名付きURL付き） */
 export async function listFiles(bucket: string, folder: string): Promise<FileInfo[]> {
-  const safeFolder = folder.replace(/\.\./g, "").replace(/\\/g, "/");
+  const safeFolder = sanitizePath(folder);
   const { data, error } = await supabase.storage.from(bucket).list(safeFolder, { sortBy: { column: "created_at", order: "desc" } });
   if (error) throw error;
   const files = (data || []).filter((f) => f.name !== ".emptyFolderPlaceholder");
@@ -67,7 +76,7 @@ export async function listFiles(bucket: string, folder: string): Promise<FileInf
 
 /** ファイル削除 */
 export async function deleteFile(bucket: string, path: string): Promise<void> {
-  const { error } = await supabase.storage.from(bucket).remove([path]);
+  const { error } = await supabase.storage.from(bucket).remove([sanitizePath(path)]);
   if (error) throw error;
 }
 
@@ -77,3 +86,6 @@ export function formatSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
+
+/** sanitizeFileName をエクスポート（FileUploader用） */
+export { sanitizeFileName };

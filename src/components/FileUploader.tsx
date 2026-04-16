@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { uploadFile, listFiles, deleteFile, formatSize, type FileInfo } from "@/lib/storage";
+import { uploadFile, listFiles, deleteFile, formatSize, sanitizeFileName, type FileInfo } from "@/lib/storage";
 import { cell, hcell, section, shead, table } from "@/lib/styles";
 
 type Props = {
@@ -25,7 +25,8 @@ export default function FileUploader({ bucket, folder, label, accept }: Props) {
     if (!file) return;
     setUploading(true); setMsg("");
     try {
-      const path = `${folder}/${Date.now()}_${file.name}`;
+      const safeName = sanitizeFileName(file.name);
+      const path = `${folder}/${Date.now()}_${safeName}`;
       await uploadFile(bucket, path, file);
       setMsg(`✅ ${file.name} をアップロードしました`);
       load();
