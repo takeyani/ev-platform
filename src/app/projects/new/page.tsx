@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CHARGER_CATEGORIES, CHARGER_MANUFACTURERS, SUBSIDY_TYPES, APPLICATION_CATEGORIES, CONSTRUCTION_AREAS } from "@/lib/constants";
+import { CHARGER_CATEGORIES, CHARGER_MANUFACTURERS, SUBSIDY_TYPES, APPLICATION_CATEGORIES, CONSTRUCTION_AREAS, PROJECT_TYPE_DETAILS } from "@/lib/constants";
 import { createProject } from "@/lib/db";
 import { invalidateProjectsCache } from "@/lib/useProjects";
 import { section, shead, pageTitle } from "@/lib/styles";
@@ -19,6 +19,7 @@ export default function NewProjectPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState<Mode>("full");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -126,7 +127,15 @@ export default function NewProjectPage() {
               <tr><td style={labelStyle}>案件ID *</td><td style={inputCell}><input name="caseId" required style={input} placeholder="T05010" /></td>
                   <td style={labelStyle}>NevID</td><td style={inputCell}><input name="nevId" style={input} placeholder="205697" /></td></tr>
               <tr><td style={labelStyle}>補助金区分 *</td><td style={inputCell}><select name="subsidyType" required style={select}><option value="">選択</option>{SUBSIDY_TYPES.map((s) => <option key={s}>{s}</option>)}</select></td>
-                  <td style={labelStyle}>申請区分</td><td style={inputCell}><select name="appCat" style={select}><option value="">選択</option>{APPLICATION_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></td></tr>
+                  <td style={labelStyle}>申請区分</td><td style={inputCell}><select name="appCat" style={select} onChange={(e) => setSelectedCategory(e.target.value)}><option value="">選択</option>{APPLICATION_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></td></tr>
+              {(() => { const info = PROJECT_TYPE_DETAILS.find(t => t.type === selectedCategory); return info ? (
+                <tr><td colSpan={4} style={{ padding: "0 8px 6px" }}>
+                  <div style={{ background: "#f0fdf4", borderRadius: 4, padding: "6px 10px", fontSize: 10, color: "#374151", lineHeight: 1.6 }}>
+                    <span style={{ fontWeight: 600, color: "#059669" }}>{info.type}</span>: {info.target}<br/>
+                    充電器: {info.chargers} / 費用: {info.cost}
+                  </div>
+                </td></tr>
+              ) : null; })()}
               <tr><td style={labelStyle}>案件名 *</td><td colSpan={3} style={inputCell}><input name="name" required style={input} placeholder="○○マンション EV充電器設置" /></td></tr>
               <tr><td style={labelStyle}>都道府県 *</td><td style={inputCell}><input name="pref" required style={input} placeholder="東京" /></td>
                   <td style={labelStyle}>住所 *</td><td style={inputCell}><input name="location" required style={input} placeholder="東京都港区芝浦3-1-1" /></td></tr>
