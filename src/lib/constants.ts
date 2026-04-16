@@ -65,11 +65,53 @@ export type ReadyStatus = "Ready" | "Not Ready" | "";
 export type WasteDisposal = "有" | "無" | "";
 export type ReportStatus = "未作成" | "提出済み" | "差戻" | "承認済み" | "";
 
-// --- 申請区分 ---
+// --- 申請区分（案件種別） ---
 export const APPLICATION_CATEGORIES = [
-  "目的地充電",
   "基礎充電",
+  "目的地充電",
+  "目的地充電(急速)",
+  "目的地充電(超急速)",
   "経路充電",
+] as const;
+
+// --- 案件種別詳細（EV補助金案件種別シートより） ---
+export const PROJECT_TYPE_DETAILS = [
+  {
+    type: "基礎充電" as const,
+    target: "集合住宅（賃貸、分譲マンション）の駐車場スペース",
+    targetParking: "全車室設置可能、設置基数に縛り無し",
+    chargers: "3kWコンセント（NOEX製）のみ",
+    installation: "シングルポール設置（自立スタンド1×本体1基）、ダブルポール（自立スタンド1×本体2基）、壁面設置（本体取付けのみ）",
+    users: "3kWコンセント設置車室を契約されている入居者のみ（マイ充電器コードにて管理）",
+    cost: "補助金申請条件に伴うイニシャルコストの一部負担有り",
+  },
+  {
+    type: "目的地充電" as const,
+    target: "商業施設、宿泊施設など、EV充電設備を設置後の利便性向上の観点から有効と考えられる施設駐車場",
+    targetParking: "通常車室（障害者専用・軽自動車専用は対象外）。200車室以下→4基以下、201車室以上→総車室の2%以下かつ50基以下",
+    chargers: "6kW普通充電器（日東工業製、河村工業製、Zerova製）3機種",
+    installation: "メーカー毎に条件有り。日東工業:シングル/ダブル/壁面、河村工業:シングル/壁面、Zerova:シングル/壁面。EV看板・路面表示必須",
+    users: "施設利用者全て利用可能",
+    cost: "無し（全額テラ負担）",
+  },
+  {
+    type: "目的地充電(急速)" as const,
+    target: "大型商業施設（イオングループ等）、大型流通店舗（コンビニ、ドラッグストア等）。テラ側指定案件のみ",
+    targetParking: "通常車室。設置基数はテラ案件担当者より指示（平均1基）",
+    chargers: "出力50kW（新電元製、ニチコン製、ダイヘン製）",
+    installation: "全メーカー独立基礎設置のみ。EV看板・路面表示必須。条件によりバリカー・積雪対応屋根がオプション",
+    users: "施設利用者全て利用可能",
+    cost: "無し（全額テラ負担）※高額案件は契約者負担有りの場合あり",
+  },
+  {
+    type: "目的地充電(超急速)" as const,
+    target: "目的地(急速)と同条件。第一種電気工事士取得＋テラ側施工認定が必須",
+    targetParking: "目的地(急速)と同条件",
+    chargers: "超急速充電器",
+    installation: "独立基礎設置",
+    users: "施設利用者全て利用可能",
+    cost: "案件毎に確認",
+  },
 ] as const;
 
 // --- 充電器種別（実際の出力カテゴリ） ---
@@ -142,9 +184,10 @@ export const INSTALLATION_PATTERNS = [
   "壁面",
 ] as const;
 
-// --- 施工エリア ---
+// --- 施工エリア（R8担当者体制準拠） ---
 export const CONSTRUCTION_AREAS = [
   "東日本",
+  "中日本",
   "西日本",
 ] as const;
 
@@ -153,6 +196,32 @@ export const DEPARTMENTS = [
   "急速 / 目的",
   "基礎 / 法人",
   "基礎 / 集合",
+] as const;
+
+// --- R8年度テラ担当者 ---
+export const TERRA_MANAGERS = [
+  { area: "東日本", name: "浅井", office: "東京本社", region: "神奈川県から東エリア全て" },
+  { area: "中日本", name: "関", office: "東京本社", region: "新潟/富山/石川/福井(日本海側)、静岡/長野/愛知/岐阜/三重" },
+  { area: "西日本", name: "大八木", office: "関西支店", region: "滋賀県から西エリア全て" },
+] as const;
+
+// --- R8年度 社内体制 ---
+export const INTERNAL_STAFF = [
+  { role: "代表", name: "本居社長", note: "テラ役員との面談、契約関係、大型案件の商談、営業" },
+  { role: "通常業務責任者", name: "西平", phone: "070-2319-6833", email: "nishihira@pandorajapan.jp", note: "営業、施工管理、電力申請、協力会社の選定、OJT" },
+  { role: "CAD図面作成", name: "松本（リブレ）", phone: "080-4033-8053", email: "ribre_matsumoto@yahoo.co.jp", note: "外注" },
+  { role: "CAD図面作成", name: "安部（タッグオンユー）", phone: "080-3410-3857", email: "u.abe@pandorajapan.jp", note: "外注" },
+  { role: "施工管理兼施工", name: "當山（S-Service）", phone: "070-3190-2671", email: "h.toyama@pandorajapan.jp", note: "外注。自社施工可能案件を担当" },
+] as const;
+
+// --- 新規現場調査依頼フロー ---
+export const SITE_SURVEY_REQUEST_FLOW = [
+  { step: 1, who: "テラ案件担当者", action: "KIZUKUアプリにて案件化通知。トヨクモR8現場調査フォルダに案件詳細情報アップ（KIZUKU反映後中1日前後）" },
+  { step: 2, who: "弊社（西平）", action: "案件種別・エリア・調査日程・事前設置案の有無など詳細確認。協力業者選定し電話にて対応可否確認" },
+  { step: 3, who: "弊社（西平）", action: "KIZUKUアプリ内で案件確認可能な状態に設定変更" },
+  { step: 4, who: "テラ営業/協力業者/弊社", action: "契約者へ現場調査日程調整連絡。パターン：テラ営業→大型案件、協力業者→対応可能な場合、弊社→最多パターン" },
+  { step: 5, who: "協力業者", action: "現場調査実施（契約者立会い有無確認済み、事前情報共有済み）" },
+  { step: 6, who: "協力業者", action: "現場調査報告書作成、KIZUKUアプリにて現地写真等の情報共有。テラ案件担当者へ提出" },
 ] as const;
 
 // --- 着工前会議 議事録項目 ---

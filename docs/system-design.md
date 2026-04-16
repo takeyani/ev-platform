@@ -420,6 +420,16 @@ CREATE POLICY "contractor_own" ON projects
   - 電話番号フォーマット（10〜11桁）チェック
 - [x] db.ts createProject() を全フィールド対応に拡張
 
+### Phase 2.8: 業務資料（260411更新）反映 ✅ 完了
+- [x] 案件種別4分類を定数化（基礎充電/目的地充電/目的地(急速)/目的地(超急速)） — PROJECT_TYPE_DETAILS
+- [x] 申請区分に「目的地充電(急速)」「目的地充電(超急速)」追加
+- [x] 施工エリアに「中日本」追加（R8担当者体制準拠）
+- [x] R8テラ担当者情報を定数化 — TERRA_MANAGERS（東日本:浅井/中日本:関/西日本:大八木）
+- [x] 社内体制を定数化 — INTERNAL_STAFF（代表/通常業務責任者/CAD/施工管理）
+- [x] 新規現場調査依頼フロー6ステップを定数化 — SITE_SURVEY_REQUEST_FLOW
+- [x] 現場調査ページに「新規現場調査依頼フロー」セクション追加
+- [x] 現調一覧に「種別」カラム追加
+
 ### Phase 2.6 動作確認結果（2026-04-09）
 - ✅ 全13ページ HTTP 200
 - ✅ 自動化ロジックテスト: 全項目PASS（checkReadyStatus / getMaterialStatus / getSafetyDocStatus / getDeadlineAlerts / suggestNextStatus / getDashboardSummary / getMonthlyInspectionSummary）
