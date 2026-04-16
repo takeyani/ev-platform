@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { CONSTRUCTION_FLOW_STEPS } from "@/lib/constants";
+import { CONSTRUCTION_FLOW_STEPS, TERRA_MANAGERS, INTERNAL_STAFF } from "@/lib/constants";
 import { getDashboardSummary, checkReadyStatus, getMaterialStatus } from "@/lib/automation";
 import { useProjects } from "@/lib/useProjects";
 import { cell, hcell, hcellG, section, shead, table, pageTitle, link, statusBadge } from "@/lib/styles";
@@ -82,7 +82,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10 }}>
         <div style={section}><div style={shead}>検収締め</div><table style={table}><tbody>
           {[{d:"毎月20日",r:"図面提出＋承認依頼",c:"#dc2626"},{d:"毎月25日",r:"承認→請求確定",c:"#dc2626"},{d:"月初2営業日",r:"請求書PDF送付",c:"#d97706"},{d:"完工後3営業日",r:"完了報告書",c:"#d97706"}].map((r)=><tr key={r.d}><td style={{...cell,fontWeight:700,color:r.c,whiteSpace:"nowrap"}}>{r.d}</td><td style={cell}>{r.r}</td></tr>)}
         </tbody></table></div>
@@ -91,6 +91,15 @@ export default function Dashboard() {
         </tbody></table></div>
         <div style={section}><div style={shead}>充電器種別</div><table style={table}><thead><tr><th style={{...hcell,textAlign:"left"}}>種別</th><th style={{...hcell,textAlign:"center"}}>件</th><th style={{...hcell,textAlign:"center"}}>台</th></tr></thead><tbody>
           {["3kWコンセント","6kW普通充電器","50kW急速充電器","90kW急速充電器"].map((cat)=>{const c=projects.filter(p=>p.chargerCategory===cat).length;const q=projects.filter(p=>p.chargerCategory===cat).reduce((s,p)=>s+p.quantity,0);return c>0?<tr key={cat}><td style={cell}>{cat}</td><td style={{...cell,textAlign:"center"}}>{c}</td><td style={{...cell,textAlign:"center",fontWeight:600}}>{q}</td></tr>:null})}
+        </tbody></table></div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div style={section}><div style={shead}>R8 テラ担当者</div><table style={table}><thead><tr><th style={hcell}>エリア</th><th style={hcell}>担当</th><th style={hcell}>拠点</th><th style={hcell}>管轄</th></tr></thead><tbody>
+          {TERRA_MANAGERS.map((m) => <tr key={m.area}><td style={{ ...cell, fontWeight: 700, color: "#059669" }}>{m.area}</td><td style={{ ...cell, fontWeight: 600 }}>{m.name}</td><td style={{ ...cell, color: "#6b7280" }}>{m.office}</td><td style={{ ...cell, fontSize: 10, color: "#6b7280" }}>{m.region}</td></tr>)}
+        </tbody></table></div>
+        <div style={section}><div style={shead}>R8 社内体制</div><table style={table}><thead><tr><th style={hcell}>役割</th><th style={hcell}>担当</th><th style={hcell}>備考</th></tr></thead><tbody>
+          {INTERNAL_STAFF.map((s) => <tr key={s.name}><td style={{ ...cell, fontWeight: 600, whiteSpace: "nowrap" }}>{s.role}</td><td style={{ ...cell, fontWeight: 600 }}>{s.name}</td><td style={{ ...cell, fontSize: 10, color: "#6b7280" }}>{s.note}</td></tr>)}
         </tbody></table></div>
       </div>
       </>)}

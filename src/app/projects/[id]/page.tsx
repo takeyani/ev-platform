@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, PROJECT_STATUSES } from "@/lib/constants";
+import { CONSTRUCTION_FLOW_STEPS, SAFETY_DOCUMENTS, PROJECT_STATUSES, PROJECT_TYPE_DETAILS } from "@/lib/constants";
 import type { Project } from "@/lib/constants";
 import { fetchProject, updateProject, deleteProject } from "@/lib/db";
 import { invalidateProjectsCache } from "@/lib/useProjects";
@@ -138,7 +138,16 @@ export default function ProjectDetailPage() {
         <div style={section}><div style={shead}>案件情報</div><table style={table}><tbody>
           {[["充電器", p.chargerCategory], ["メーカー", `${p.chargerManufacturer} ${p.chargerModel}`], ["台数", `${p.quantity}台`], ["施工会社", p.contractor], ["補助金", p.subsidyType], ["申請区分", p.applicationCategory], ["案件担当", p.caseManager], ["施工管理", p.constructionManager]].map(([k, v]) => <tr key={k}><td style={{ ...cell, color: "#6b7280", width: "40%" }}>{k}</td><td style={{ ...cell, fontWeight: 500 }}>{v || "-"}</td></tr>)}
           {p.notes && <tr><td style={{ ...cell, color: "#6b7280" }}>備考</td><td style={cell}>{p.notes}</td></tr>}
-        </tbody></table></div>
+        </tbody></table>
+        {(() => { const typeInfo = PROJECT_TYPE_DETAILS.find(t => t.type === p.applicationCategory); return typeInfo ? (
+          <div style={{ padding: "6px 8px", background: "#f0fdf4", borderRadius: 4, margin: "6px 0 0", fontSize: 10, color: "#374151", lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 600, color: "#059669", marginBottom: 2 }}>{typeInfo.type} 条件</div>
+            <div>対象: {typeInfo.target}</div>
+            <div>充電器: {typeInfo.chargers}</div>
+            <div>費用: {typeInfo.cost}</div>
+          </div>
+        ) : null; })()}
+        </div>
 
         <div style={section}><div style={shead}>📅 日程管理（日付をクリックして編集）</div><table style={table}><tbody>
           {dateField("発注日", p.orderDate, "order_date")}
